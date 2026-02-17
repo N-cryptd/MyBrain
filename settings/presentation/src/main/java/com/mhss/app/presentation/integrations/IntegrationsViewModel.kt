@@ -68,6 +68,13 @@ class IntegrationsViewModel(
                     IntKey(PrefsConstants.AI_PROVIDER_KEY),
                     event.provider.id
                 )
+                // Automatically save the default model when switching providers
+                event.provider.modelPrefsKey?.let { modelKey ->
+                    val defaultModel = event.provider.defaultModel
+                    if (!defaultModel.isNullOrBlank()) {
+                        saveSettings(modelKey, defaultModel)
+                    }
+                }
             }
 
             is IntegrationsEvent.UpdateApiKey -> {
