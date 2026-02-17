@@ -1,4 +1,4 @@
-name: Build APK
+name: Build and Release APK
 
 on:
   push:
@@ -6,10 +6,34 @@ on:
   pull_request:
     branches: [ master, main ]
   workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create GitHub Release'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+      release_tag:
+        description: 'Release Tag (e.g., v1.0.0) - only used if create_release is true'
+        required: false
+        default: ''
+        type: string
+      release_notes:
+        description: 'Release Notes'
+        required: false
+        default: ''
+        type: string
+  release:
+    types: [created]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.get_version.outputs.VERSION_NAME }}
+      version_code: ${{ steps.get_version.outputs.VERSION_CODE }}
     
     steps:
     - name: Checkout repository
@@ -26,6 +50,15 @@ jobs:
       
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+      
+    - name: Get Version Info
+      id: get_version
+      run: |
+        VERSION_NAME=$(grep "versionName" app/build.gradle.kts | head -1 | sed 's/.*"\(.*\)".*/\1/')
+        VERSION_CODE=$(grep "versionCode" app/build.gradle.kts | head -1 | grep -o '[0-9]\+')
+        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
+        echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_OUTPUT
+        echo "Version: $VERSION_NAME ($VERSION_CODE)"
       
     - name: Cache Gradle packages
       uses: actions/cache@v4
@@ -45,7 +78,7 @@ jobs:
       with:
         name: debug-apk
         path: app/build/outputs/apk/debug/*.apk
-        retention-days: 7
+        retention-days: 30
         
     - name: Decode Keystore
       if: github.event_name != 'pull_request'
@@ -71,7 +104,7 @@ jobs:
           ./gradlew :app:assembleRelease --no-daemon
         else
           echo "Building unsigned release (no keystore)"
-          ./gradlew :app:assembleRelease --no-daemons
+          ./gradlew :app:assembleRelease --no-daemon
         fi
       
     - name: Upload Release APK
@@ -80,4 +113,84 @@ jobs:
       with:
         name: release-apk
         path: app/build/outputs/apk/release/*.apk
-        retention-days: 7
+        retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'release' || 
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true')
+    
+    steps:
+    - name: Download Release APK
+      uses: actions/download-artifact@v4
+      with:
+        name: release-apk
+        path: release-apk
+        
+    - name: Download Debug APK
+      uses: actions/download-artifact@v4
+      with:
+        name: debug-apk
+        path: debug-apk
+        
+    - name: Prepare Release Files
+      run: |
+        mkdir -p release-assets
+        cp release-apk/*.apk release-assets/ 2>/dev/null || echo "No release APK found"
+        cp debug-apk/*.apk release-assets/ 2>/dev/null || echo "No debug APK found"
+        ls -la release-assets/
+        
+    - name: Get Release Info
+      id: release_info
+      run: |
+        if [ "${{ github.event_name }}" == "release" ]; then
+          echo "TAG=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
+          echo "NAME=${{ github.event.release.name }}" >> $GITHUB_OUTPUT
+          echo "BODY=${{ github.event.release.body }}" >> $GITHUB_OUTPUT
+        else
+          # Workflow dispatch
+          TAG="${{ github.event.inputs.release_tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="v${{ needs.build.outputs.version_name }}"
+          fi
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "NAME=MyBrain $TAG" >> $GITHUB_OUTPUT
+          echo "BODY=${{ github.event.inputs.release_notes }}" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create Release
+      if: github.event_name == 'workflow_dispatch' && github.event.inputs.create_release == 'true'
+      uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.release_info.outputs.TAG }}
+        release_name: ${{ steps.release_info.outputs.NAME }}
+        body: ${{ steps.release_info.outputs.BODY }}
+        draft: false
+        prerelease: false
+        
+    - name: Upload APKs to Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.release_info.outputs.TAG }}
+        files: release-assets/*.apk
+        name: ${{ steps.release_info.outputs.NAME }}
+        body: |
+          ${{ steps.release_info.outputs.BODY }}
+          
+          ## Downloads
+          - Release APK: Signed production build
+          - Debug APK: Debug build for testing
+          
+          ## Version Info
+          - Version: ${{ needs.build.outputs.version_name }}
+          - Version Code: ${{ needs.build.outputs.version_code }}
+          
+          ## Changes in this Release
+          ${{ github.event.release.body || github.event.inputs.release_notes || 'See commits for details' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
