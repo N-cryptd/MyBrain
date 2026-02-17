@@ -33,11 +33,19 @@ android {
             val keyAlias = System.getenv("KEY_ALIAS") ?: ""
             val keyPassword = System.getenv("KEY_PASSWORD") ?: ""
             
-            if (keystorePath.isNotBlank() && File(keystorePath).exists()) {
-                storeFile = file(keystorePath)
-                storePassword = keystorePassword
-                this.keyAlias = keyAlias
-                this.keyPassword = keyPassword
+            if (keystorePath.isNotBlank()) {
+                val keystoreFile = if (File(keystorePath).isAbsolute) {
+                    File(keystorePath)
+                } else {
+                    // Resolve relative to project root
+                    project.rootProject.file(keystorePath)
+                }
+                if (keystoreFile.exists()) {
+                    storeFile = keystoreFile
+                    storePassword = keystorePassword
+                    this.keyAlias = keyAlias
+                    this.keyPassword = keyPassword
+                }
             }
         }
     }
