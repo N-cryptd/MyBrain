@@ -339,7 +339,14 @@ private fun AiProvider.getExecutor(key: String, customUrl: String): PromptExecut
         )
         AiProvider.GLM -> OpenAILLMClient(
             apiKey = key,
-            settings = if (customUrl.isBlank()) OpenAIClientSettings(baseUrl = "https://api.z.ai/api/coding/paas/v4") else OpenAIClientSettings(baseUrl = customUrl)
+            settings = if (customUrl.isBlank()) {
+                OpenAIClientSettings(
+                    baseUrl = "https://api.z.ai",
+                    chatCompletionsPath = "/api/coding/paas/v4/chat/completions"
+                )
+            } else {
+                OpenAIClientSettings(baseUrl = customUrl)
+            }
         )
         AiProvider.None -> EmptyAiClient
     }
