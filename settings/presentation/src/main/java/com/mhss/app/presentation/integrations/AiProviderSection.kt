@@ -83,6 +83,11 @@ fun AiProviderSection(
             icon = painterResource(id = R.drawable.ic_openrouter)
         ),
         ProviderOption(
+            provider = AiProvider.GLM,
+            label = stringResource(R.string.glm),
+            icon = painterResource(id = R.drawable.ic_glm)
+        ),
+        ProviderOption(
             provider = AiProvider.LmStudio,
             label = stringResource(R.string.lm_studio),
             icon = painterResource(id = R.drawable.ic_lmstudio)

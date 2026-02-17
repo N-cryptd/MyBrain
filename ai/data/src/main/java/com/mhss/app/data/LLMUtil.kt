@@ -89,6 +89,7 @@ fun AiProvider.toLLMProvider() = when (this) {
     AiProvider.OpenRouter -> LLMProvider.OpenRouter
     AiProvider.Ollama -> LLMProvider.Ollama
     AiProvider.LmStudio -> LLMProvider.OpenAI
+    AiProvider.GLM -> LLMProvider.OpenAI
     AiProvider.None -> LLMProvider.OpenAI // just a placeholder
 }
 

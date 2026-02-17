@@ -78,6 +78,18 @@ enum class AiProvider(
         isLocalProvider = true,
         customUrlPref = PrefsConstants.OLLAMA_URL_KEY,
         defaultBaseUrl = "http://192.168.1.100:11434"
+    ),
+    GLM(
+        id = 7,
+        keyPref = PrefsConstants.GLM_KEY,
+        modelPref = PrefsConstants.GLM_MODEL_KEY,
+        defaultModel = "glm-4.7",
+        keyInfoUrl = "https://z.ai/apikeys",
+        modelsInfoUrl = "https://docs.z.ai/devpack/overview",
+        supportsCustomUrl = true,
+        customUrlPref = PrefsConstants.GLM_URL_KEY,
+        customUrlEnabledPref = PrefsConstants.GLM_USE_URL_KEY,
+        defaultBaseUrl = "https://api.z.ai/api/coding/paas/v4"
     );
 }
 

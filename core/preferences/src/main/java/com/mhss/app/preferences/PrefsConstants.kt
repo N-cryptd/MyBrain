@@ -37,6 +37,10 @@ object PrefsConstants {
     const val OLLAMA_URL_KEY = "ollama_url"
     const val GEMINI_MODEL_KEY = "gemini_model"
     const val GEMINI_KEY = "gemini_key"
+    const val GLM_MODEL_KEY = "glm_model"
+    const val GLM_KEY = "glm_key"
+    const val GLM_URL_KEY = "glm_url"
+    const val GLM_USE_URL_KEY = "glm_use_url"
     const val AI_PROVIDER_KEY = "ai_api"
     const val AI_TOOLS_ENABLED_KEY = "ai_tools_enabled"
 

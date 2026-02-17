@@ -191,6 +191,7 @@
     <string name="ollama" translatable="false">Ollama</string>
     <string name="lm_studio" translatable="false">LM Studio</string>
     <string name="openai">OpenAI</string>
+    <string name="glm" translatable="false">GLM</string>
     <string name="model">Model</string>
     <string name="custom_url">Custom URL</string>
     <string name="ai_provider">AI provider</string>

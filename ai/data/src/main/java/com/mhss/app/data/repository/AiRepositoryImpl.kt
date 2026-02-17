@@ -337,6 +337,10 @@ private fun AiProvider.getExecutor(key: String, customUrl: String): PromptExecut
             apiKey = "",
             settings = OpenAIClientSettings(baseUrl = customUrl)
         )
+        AiProvider.GLM -> OpenAILLMClient(
+            apiKey = key,
+            settings = if (customUrl.isBlank()) OpenAIClientSettings(baseUrl = "https://api.z.ai/api/coding/paas/v4") else OpenAIClientSettings(baseUrl = customUrl)
+        )
         AiProvider.None -> EmptyAiClient
     }
     return SingleLLMPromptExecutor(client)
