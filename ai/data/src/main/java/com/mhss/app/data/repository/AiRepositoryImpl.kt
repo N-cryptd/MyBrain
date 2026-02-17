@@ -337,17 +337,20 @@ private fun AiProvider.getExecutor(key: String, customUrl: String): PromptExecut
             apiKey = "",
             settings = OpenAIClientSettings(baseUrl = customUrl)
         )
-        AiProvider.GLM -> OpenAILLMClient(
-            apiKey = key,
-            settings = if (customUrl.isBlank()) {
+        AiProvider.GLM -> {
+            val glmSettings = if (customUrl.isBlank()) {
                 OpenAIClientSettings(
-                    baseUrl = "https://api.z.ai",
-                    chatCompletionsPath = "/api/coding/paas/v4/chat/completions"
+                    baseUrl = "https://api.z.ai/api/coding/paas/v4",
+                    chatCompletionsPath = "chat/completions"
                 )
             } else {
                 OpenAIClientSettings(baseUrl = customUrl)
             }
-        )
+            OpenAILLMClient(
+                apiKey = key,
+                settings = glmSettings
+            )
+        }
         AiProvider.None -> EmptyAiClient
     }
     return SingleLLMPromptExecutor(client)
