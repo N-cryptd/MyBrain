@@ -339,9 +339,11 @@ private fun AiProvider.getExecutor(key: String, customUrl: String): PromptExecut
         )
         AiProvider.GLM -> {
             val glmSettings = if (customUrl.isBlank()) {
+                // GLM Coding Plan uses full path in chatCompletionsPath
+                // Koog only uses host from baseUrl
                 OpenAIClientSettings(
-                    baseUrl = "https://api.z.ai/api/coding/paas/v4",
-                    chatCompletionsPath = "chat/completions"
+                    baseUrl = "https://api.z.ai",
+                    chatCompletionsPath = "api/coding/paas/v4/chat/completions"
                 )
             } else {
                 OpenAIClientSettings(baseUrl = customUrl)
