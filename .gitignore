@@ -11,3 +11,10 @@
 local.properties
 /app/release
 /.kotlin/
+
+# Keystore files - never commit these!
+*.keystore
+*.jks
+*.p12
+*.key
+keystore.properties
