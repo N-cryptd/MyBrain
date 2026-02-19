@@ -1,12 +1,12 @@
 <p align="center">
-  <img alt="Stars" src="https://img.shields.io/github/stars/mhss1/mybrain?style=social" />
+  <img alt="Stars" src="https://img.shields.io/github/stars/N-cryptd/MyBrain?style=social" />
   <a href="https://www.gnu.org/licenses/gpl-3.0"><img alt="License: GPL v3" src="https://img.shields.io/badge/License-GPLv3-blue.svg" /></a>
   <a href="https://crowdin.com/project/my-brain-app"><img alt="Crowdin" src="https://badges.crowdin.net/my-brain-app/localized.svg" /></a>
 </p>
 
 
 <h1 align="center">
-  <a href="https://github.com/mhss1/MyBrain">
+  <a href="https://github.com/N-cryptd/MyBrain">
     <img alt="My Brain" src="https://github.com/user-attachments/assets/3a33b973-0686-4ac5-b987-41bfb081ba81" width="180" />
   </a>
   <br>
@@ -24,7 +24,7 @@
     height="80">](https://f-droid.org/packages/com.mhss.app.mybrain)
 [<img src="https://github.com/mhss1/MyBrain/assets/58703865/94cbf557-b1a9-4339-b6b4-def21dde3c11"
      alt="Get it on GitHub"
-     height="80">](https://github.com/mhss1/MyBrain/releases/latest)
+     height="80">](https://github.com/N-cryptd/MyBrain/releases/latest)
       
 ## Features
 - Local and Private with no data collection at all.
@@ -57,6 +57,19 @@
 ## Translation
 Project localisation is managed via [Crowdin](https://crowdin.com/project/my-brain-app)
 [![Crowdin](https://badges.crowdin.net/my-brain-app/localized.svg)](https://crowdin.com/project/my-brain-app)
+
+## About This Fork
+
+This is a fork of [mhss1/MyBrain](https://github.com/mhss1/MyBrain) with custom enhancements and a personalized development roadmap.
+
+### Changes in This Fork
+- GLM AI integration with advanced models (glm-4.7, glm-4.5, glm-4.6)
+- Custom AI tool implementations
+- GitHub Actions CI/CD pipeline for automated builds
+- Development roadmap for personalized features
+- Focus on specific feature improvements and bug fixes
+
+See [FORK_NOTES.md](FORK_NOTES.md) for detailed information about fork-specific changes.
 
 ## Contributing
 To get started, take a look at [CONTRIBUTING.md](CONTRIBUTING.md).

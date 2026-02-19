@@ -1,5 +1,9 @@
 # Building MyBrain APK with GLM Integration
 
+## Fork Information
+
+This is a fork of [mhss1/MyBrain](https://github.com/mhss1/MyBrain) maintained by [N-cryptd](https://github.com/N-cryptd). For detailed information about this fork, see [FORK_NOTES.md](FORK_NOTES.md).
+
 ## Overview
 
 The MyBrain app has been successfully updated with GLM Coding Plan integration. However, due to architecture limitations (we're running on ARM64), the Android SDK's aapt2 binary (which is x86_64 only) cannot run natively on this system.
@@ -29,7 +33,7 @@ I've created a GitHub Actions workflow (`.github/workflows/build-apk.yml`) that 
    - Upload both APKs as artifacts
 
 4. **Download the APK:**
-   - Go to your GitHub repository
+   - Go to your GitHub repository (https://github.com/N-cryptd/MyBrain)
    - Click on "Actions" tab
    - Select the latest workflow run
    - Download the APK artifacts
@@ -142,6 +146,21 @@ The GLM provider uses the following default configuration:
 6. `settings/presentation/src/main/java/com/mhss/app/presentation/integrations/AiProviderSection.kt`
 7. `core/ui/src/main/res/drawable/ic_glm.xml` (new file)
 8. `.github/workflows/build-apk.yml` (new file)
+
+## Fork-Specific Notes
+
+### Current State
+- Based on last successfully compiled version (commit 56b4251)
+- All repository links updated to point to N-cryptd/MyBrain
+- Development roadmap available at [GitHub Project](https://github.com/users/N-cryptd/projects/2)
+
+### Known Issues
+- Habits module temporarily removed due to compilation errors (planned for restoration in Tier 1)
+- VoiceInputUtil removed due to compilation issues
+
+### Development Branches
+- `master`: Stable production builds
+- `dev`: Development and feature work
 
 ## License
 
