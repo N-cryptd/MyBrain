@@ -1,8 +1,7 @@
 package com.mhss.app.data
 
 import com.mhss.app.database.dao.HabitDao
-import com.mhss.app.database.entity.toHabit
-import com.mhss.app.database.entity.toHabitEntity
+import com.mhss.app.database.entity.HabitEntity
 import com.mhss.app.domain.model.Habit
 import com.mhss.app.domain.model.HabitFrequency
 import com.mhss.app.domain.repository.HabitRepository

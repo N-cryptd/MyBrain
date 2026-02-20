@@ -4,9 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mhss.app.database.converters.IdSerializer
-import com.mhss.app.domain.model.Habit
-import com.mhss.app.domain.model.HabitFrequency
-import com.mhss.app.domain.model.Priority
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -18,7 +15,7 @@ data class HabitEntity(
     @SerialName("description")
     val description: String = "",
     @SerialName("priority")
-    val priority: Int = Priority.LOW.value,
+    val priority: Int = 0,
     @SerialName("createdDate")
     @ColumnInfo(name = "created_date")
     val createdDate: Long = 0L,
@@ -26,7 +23,7 @@ data class HabitEntity(
     @ColumnInfo(name = "updated_date")
     val updatedDate: Long = 0L,
     @SerialName("frequency")
-    val frequency: Int = HabitFrequency.DAILY.value,
+    val frequency: Int = 0,
     @SerialName("frequencyDays")
     @ColumnInfo(name = "frequency_days")
     val frequencyDays: List<Int> = emptyList(),

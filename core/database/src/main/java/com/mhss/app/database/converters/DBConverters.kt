@@ -24,4 +24,28 @@ class DBConverters {
     fun toMood(value: Int) = enumValues<Mood>()[value]
     @TypeConverter
     fun fromMood(value: Mood) = value.ordinal
+
+    @TypeConverter
+    fun fromIntList(value: List<Int>): String {
+        return Json.encodeToString(value)
+    }
+    @TypeConverter
+    fun toIntList(value: String): List<Int> {
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        return json.decodeFromString<List<Int>>(value)
+    }
+
+    @TypeConverter
+    fun fromLongList(value: List<Long>): String {
+        return Json.encodeToString(value)
+    }
+    @TypeConverter
+    fun toLongList(value: String): List<Long> {
+        val json = Json {
+            ignoreUnknownKeys = true
+        }
+        return json.decodeFromString<List<Long>>(value)
+    }
 }

@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.mhss.app.domain.model.Habit
 import com.mhss.app.domain.model.Priority
 import com.mhss.app.presentation.HabitsScreen
+import com.mhss.app.presentation.util.color
 import com.mhss.app.ui.R
-import com.mhss.app.ui.color
 import com.mhss.app.util.date.formatDateDependingOnDay
 
 @Composable
