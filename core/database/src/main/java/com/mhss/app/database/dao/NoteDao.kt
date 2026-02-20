@@ -9,17 +9,18 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.mhss.app.database.entity.NoteEntity
+import com.mhss.app.database.entity.NoteListItem
 import com.mhss.app.database.entity.NoteFolderEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface NoteDao {
 
-    @Query("SELECT title, SUBSTR(content, 1, 150) AS content, created_date, updated_date, pinned, folder_id, id FROM notes WHERE folder_id IS NULL")
-    fun getAllFolderlessNotes(): Flow<List<NoteEntity>>
+    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date, updated_date, pinned, folder_id FROM notes WHERE folder_id IS NULL")
+    fun getAllFolderlessNotes(): Flow<List<NoteListItem>>
 
-    @Query("SELECT title, SUBSTR(content, 1, 150) AS content, created_date, updated_date, pinned, folder_id, id FROM notes")
-    fun getAllNotes(): Flow<List<NoteEntity>>
+    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date, updated_date, pinned, folder_id FROM notes")
+    fun getAllNotes(): Flow<List<NoteListItem>>
 
     @Query("SELECT * FROM notes")
     suspend fun getAllFullNotes(): List<NoteEntity>
@@ -27,11 +28,11 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE id = :id")
     suspend fun getNote(id: String): NoteEntity?
 
-    @Query("SELECT title, SUBSTR(content, 1, 100) AS content, created_date, updated_date, pinned, folder_id, id FROM notes WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
-    suspend fun getNotesByTitle(query: String): List<NoteEntity>
+    @Query("SELECT id, title, SUBSTR(content, 1, 100) AS contentPreview, created_date, updated_date, pinned, folder_id FROM notes WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
+    suspend fun getNotesByTitle(query: String): List<NoteListItem>
 
-    @Query("SELECT title, SUBSTR(content, 1, 150) AS content, created_date, updated_date, pinned, folder_id, id FROM notes WHERE folder_id = :folderId")
-    fun getNotesByFolder(folderId: String): Flow<List<NoteEntity>>
+    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date, updated_date, pinned, folder_id FROM notes WHERE folder_id = :folderId")
+    fun getNotesByFolder(folderId: String): Flow<List<NoteListItem>>
 
     @Query("DELETE FROM notes WHERE folder_id = :folderId")
     suspend fun deleteNotesByFolderId(folderId: String)

@@ -30,6 +30,16 @@ data class DiaryEntryEntity(
     val id: String
 )
 
+@Serializable
+data class DiaryListItem(
+    val id: String,
+    val title: String,
+    val contentPreview: String,
+    val createdDate: Long,
+    val updatedDate: Long,
+    val mood: Mood
+)
+
 fun DiaryEntryEntity.toDiaryEntry() = DiaryEntry(
     title = title,
     content = content,
@@ -42,6 +52,15 @@ fun DiaryEntryEntity.toDiaryEntry() = DiaryEntry(
 fun DiaryEntry.toDiaryEntryEntity() = DiaryEntryEntity(
     title = title,
     content = content,
+    createdDate = createdDate,
+    updatedDate = updatedDate,
+    mood = mood,
+    id = id
+)
+
+fun DiaryListItem.toDiaryEntry() = DiaryEntry(
+    title = title,
+    content = contentPreview,
     createdDate = createdDate,
     updatedDate = updatedDate,
     mood = mood,

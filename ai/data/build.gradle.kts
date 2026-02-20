@@ -25,4 +25,9 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
 
     implementation(libs.koog.agents)
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+    testImplementation(libs.junit)
 }

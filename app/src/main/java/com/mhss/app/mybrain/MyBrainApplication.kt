@@ -22,6 +22,7 @@ import com.mhss.app.data.noteDataModule
 import com.mhss.app.data.noteMarkdownModule
 import com.mhss.app.data.noteRoomModule
 import com.mhss.app.data.tasksDataModule
+import com.mhss.app.data.habitsDataModule
 import com.mhss.app.database.di.databaseModule
 import com.mhss.app.di.coroutinesModule
 import com.mhss.app.mybrain.di.MainPresentationModule
@@ -33,6 +34,7 @@ import com.mhss.app.preferences.domain.model.stringPreferencesKey
 import com.mhss.app.preferences.domain.use_case.GetPreferenceUseCase
 import com.mhss.app.presentation.di.AiPresentationModule
 import com.mhss.app.presentation.di.BookmarksPresentationModule
+import com.mhss.app.presentation.di.HabitsPresentationModule
 import com.mhss.app.presentation.di.CalendarPresentationModule
 import com.mhss.app.presentation.di.DiaryPresentationModule
 import com.mhss.app.presentation.di.NotePresentationModule
@@ -85,7 +87,9 @@ class MyBrainApplication : Application() {
                 bookmarksDataModule,
                 WidgetModule().module,
                 aiDataModule,
-                AiPresentationModule().module
+                habitsDataModule,
+                AiPresentationModule().module,
+                HabitsPresentationModule().module
             )
             workManagerFactory()
         }

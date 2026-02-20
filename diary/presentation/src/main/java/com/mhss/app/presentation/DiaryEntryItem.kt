@@ -26,6 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mhss.app.domain.model.DiaryEntry
+import com.mhss.app.domain.model.Mood
+import com.mhss.app.database.entity.DiaryListItem
 import com.mhss.app.ui.components.common.previewMarkdownTypography
 import com.mhss.app.util.date.fullDate
 import com.mikepenz.markdown.m3.Markdown
@@ -37,6 +39,48 @@ fun LazyItemScope.DiaryEntryItem(
     timeText: String = entry.createdDate.fullDate(LocalContext.current),
     onClick: (DiaryEntry) -> Unit
 ) {
+    DiaryEntryItemInternal(
+        modifier = modifier,
+        id = entry.id,
+        title = entry.title,
+        content = entry.content,
+        createdDate = entry.createdDate,
+        mood = entry.mood,
+        timeText = timeText,
+        onClick = { onClick(entry) }
+    )
+}
+
+@Composable
+fun LazyItemScope.DiaryEntryItem(
+    modifier: Modifier = Modifier,
+    entry: DiaryListItem,
+    timeText: String = entry.createdDate.fullDate(LocalContext.current),
+    onClick: (DiaryListItem) -> Unit
+) {
+    DiaryEntryItemInternal(
+        modifier = modifier,
+        id = entry.id,
+        title = entry.title,
+        content = entry.contentPreview,
+        createdDate = entry.createdDate,
+        mood = entry.mood,
+        timeText = timeText,
+        onClick = { onClick(entry) }
+    )
+}
+
+@Composable
+private fun LazyItemScope.DiaryEntryItemInternal(
+    modifier: Modifier = Modifier,
+    id: String,
+    title: String,
+    content: String,
+    createdDate: Long,
+    mood: Mood,
+    timeText: String,
+    onClick: () -> Unit
+) {
     Card(
         modifier = modifier
             .animateItem(),
@@ -45,28 +89,28 @@ fun LazyItemScope.DiaryEntryItem(
     ) {
         Column(
             modifier = Modifier
-                .clickable { onClick(entry) }
+                .clickable { onClick() }
                 .padding(12.dp)
                 .fillMaxWidth()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    painterResource(entry.mood.iconRes),
-                    stringResource(entry.mood.titleRes),
-                    tint = entry.mood.color,
+                    painterResource(mood.iconRes),
+                    stringResource(mood.titleRes),
+                    tint = mood.color,
                     modifier = Modifier.size(30.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    entry.title,
+                    title,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            if (entry.content.isNotBlank()){
+            if (content.isNotBlank()){
                 Markdown(
-                    content = entry.content,
+                    content = content,
                     typography = previewMarkdownTypography()
                 )
                 Spacer(Modifier.height(8.dp))

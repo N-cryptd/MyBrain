@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.mhss.app.domain.model.Note
+import com.mhss.app.database.entity.NoteListItem
 import com.mhss.app.ui.R
 import com.mhss.app.ui.components.common.previewMarkdownTypography
 import com.mhss.app.ui.theme.Orange
@@ -41,26 +42,61 @@ fun NoteCard(
     note: Note,
     onClick: (Note) -> Unit,
 ) {
+    NoteCardInternal(
+        modifier = modifier,
+        title = note.title,
+        content = note.content,
+        updatedDate = note.updatedDate,
+        pinned = note.pinned,
+        onClick = { onClick(note) }
+    )
+}
+
+@Composable
+fun NoteCard(
+    modifier: Modifier = Modifier,
+    note: NoteListItem,
+    onClick: (NoteListItem) -> Unit,
+) {
+    NoteCardInternal(
+        modifier = modifier,
+        title = note.title,
+        content = note.contentPreview,
+        updatedDate = note.updatedDate,
+        pinned = note.pinned,
+        onClick = { onClick(note) }
+    )
+}
+
+@Composable
+private fun NoteCardInternal(
+    modifier: Modifier = Modifier,
+    title: String,
+    content: String,
+    updatedDate: Long,
+    pinned: Boolean,
+    onClick: () -> Unit,
+) {
     val context = LocalContext.current
-    val formattedDate by remember(note.updatedDate) {
-        derivedStateOf { note.updatedDate.formatDateDependingOnDay(context) }
+    val formattedDate by remember(updatedDate) {
+        derivedStateOf { updatedDate.formatDateDependingOnDay(context) }
     }
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.elevatedCardElevation(4.dp),
-        onClick = { onClick(note) }
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier
-                .clickable { onClick(note) }
+                .clickable { onClick() }
                 .padding(12.dp)
                 .fillMaxWidth()
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (note.pinned) {
+                if (pinned) {
                     Icon(
                         painter = painterResource(R.drawable.ic_pin_filled),
                         contentDescription = stringResource(R.string.pin_note),
@@ -71,7 +107,7 @@ fun NoteCard(
                     Spacer(Modifier.width(4.dp))
                 }
                 Text(
-                    note.title,
+                    title,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -79,7 +115,7 @@ fun NoteCard(
             }
             Spacer(Modifier.height(8.dp))
             Markdown(
-                content = note.content,
+                content = content,
                 typography = previewMarkdownTypography()
             )
             Spacer(Modifier.height(8.dp))

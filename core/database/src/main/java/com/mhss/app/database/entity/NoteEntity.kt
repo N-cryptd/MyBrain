@@ -33,6 +33,17 @@ data class NoteEntity(
     val id: String,
 )
 
+@Serializable
+data class NoteListItem(
+    val id: String,
+    val title: String,
+    val contentPreview: String,
+    val createdDate: Long,
+    val updatedDate: Long,
+    val pinned: Boolean,
+    val folderId: String?
+)
+
 fun NoteEntity.toNote(): Note {
     return Note(
         title = title,
@@ -54,5 +65,17 @@ fun Note.toNoteEntity(): NoteEntity {
         pinned = pinned,
         folderId = folderId,
         id = id
+    )
+}
+
+fun NoteListItem.toNote(): Note {
+    return Note(
+        title = title,
+        content = contentPreview,
+        createdDate = createdDate,
+        updatedDate = updatedDate,
+        pinned = pinned,
+        folderId = folderId,
+        id = id,
     )
 }

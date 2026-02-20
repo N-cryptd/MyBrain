@@ -3,6 +3,7 @@ package com.mhss.app.data
 import com.mhss.app.database.dao.DiaryDao
 import com.mhss.app.database.entity.toDiaryEntry
 import com.mhss.app.database.entity.toDiaryEntryEntity
+import com.mhss.app.database.entity.DiaryListItem
 import com.mhss.app.domain.model.DiaryEntry
 import com.mhss.app.domain.repository.DiaryRepository
 import kotlinx.coroutines.CoroutineDispatcher

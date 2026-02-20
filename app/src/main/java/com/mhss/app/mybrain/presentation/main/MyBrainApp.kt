@@ -49,6 +49,9 @@ import com.mhss.app.presentation.NotesSearchScreen
 import com.mhss.app.presentation.TaskDetailScreen
 import com.mhss.app.presentation.TasksScreen
 import com.mhss.app.presentation.TasksSearchScreen
+import com.mhss.app.presentation.HabitsScreen
+import com.mhss.app.presentation.HabitDetailScreen
+import com.mhss.app.presentation.HabitSearchScreen
 import com.mhss.app.presentation.backup.ImportExportScreen
 import com.mhss.app.presentation.integrations.IntegrationsScreen
 import com.mhss.app.ui.R
@@ -190,6 +193,28 @@ fun MyBrainApp(
                     exitTransition = { slideDownTransition() },
                 ) {
                     TasksSearchScreen(navController = navController)
+                }
+                composable<Screen.HabitsScreen>(
+                    enterTransition = { slideInTransition() },
+                    exitTransition = { slideOutTransition() },
+                ) {
+                    HabitsScreen(navController = navController)
+                }
+                composable<Screen.HabitDetailScreen>(
+                    enterTransition = { slideInTransition() },
+                    exitTransition = { slideOutTransition() },
+                ) {
+                    val args = it.toRoute<Screen.HabitDetailScreen>()
+                    HabitDetailScreen(
+                        navController = navController,
+                        habitId = args.habitId
+                    )
+                }
+                composable<Screen.HabitSearchScreen>(
+                    enterTransition = { slideUpTransition() },
+                    exitTransition = { slideDownTransition() },
+                ) {
+                    HabitSearchScreen(navController = navController)
                 }
                 composable<Screen.NotesScreen>(
                     enterTransition = { slideInTransition() },

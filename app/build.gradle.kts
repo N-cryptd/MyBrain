@@ -108,6 +108,7 @@ dependencies {
     implementation(project(":diary:presentation"))
     implementation(project(":settings:presentation"))
     implementation(project(":ai:presentation"))
+    implementation(project(":habits:presentation"))
 
     implementation(project(":notes:data"))
     implementation(project(":tasks:data"))

@@ -84,4 +84,15 @@ sealed class Screen {
 
     @Serializable
     data object AssistantScreen : Screen()
+
+    @Serializable
+    data object HabitsScreen : Screen()
+
+    @Serializable
+    data class HabitDetailScreen(
+        val habitId: String? = null
+    ): Screen()
+
+    @Serializable
+    data object HabitSearchScreen : Screen()
 }

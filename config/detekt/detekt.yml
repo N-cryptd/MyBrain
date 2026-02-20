@@ -1,0 +1,49 @@
+build:
+  maxIssues: 0
+
+config:
+  validation: true
+
+complexity:
+  LongMethod:
+    active: false
+  LongParameterList:
+    functionThreshold: 8
+
+coroutines:
+  GlobalCoroutineUsage:
+    active: false
+
+empty-blocks:
+  EmptyFunctionBlock:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+  TooGenericExceptionThrown:
+    active: false
+
+naming:
+  FunctionNaming:
+    active: false
+  TopLevelPropertyNaming:
+    active: false
+
+performance:
+  SpreadOperator:
+    active: false
+
+potential-bugs:
+  IgnoredReturnValue:
+    active: false
+  DontDowncastCollectionTypes:
+    active: false
+
+style:
+  MaxLineLength:
+    maxLineLength: 120
+  UnusedPrivateMember:
+    active: false
+  MagicNumber:
+    active: false

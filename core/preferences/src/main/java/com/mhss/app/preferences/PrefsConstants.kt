@@ -9,6 +9,7 @@ object PrefsConstants {
     const val SHOW_COMPLETED_TASKS_KEY = "show_completed_tasks"
     const val SHOW_ALL_NOTES_KEY = "show_all_notes"
     const val TASKS_ORDER_KEY = "tasks_order"
+    const val HABITS_ORDER_KEY = "habits_order"
     const val NOTE_VIEW_KEY = "note_view"
     const val BOOKMARK_VIEW_KEY = "bookmark_view"
     const val NOTES_ORDER_KEY = "notes_order"

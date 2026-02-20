@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.jetbrains.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.compose.compiler) apply false
+    alias(libs.plugins.detekt) apply false
 }
 
 subprojects {
@@ -26,3 +27,13 @@ subprojects {
         }
     }
 }
+
+// detekt {
+//     buildUponDefaultConfig = true
+//     config.setFrom("$projectDir/config/detekt/detekt.yml")
+//     allRules = false
+// }
+
+// dependencies {
+//     detektPlugins(libs.detekt.formatting)
+// }

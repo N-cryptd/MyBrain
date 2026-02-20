@@ -201,3 +201,30 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
         db.execSQL("ALTER TABLE diary_new RENAME TO diary")
     }
 }
+
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE habits (
+                id TEXT PRIMARY KEY NOT NULL,
+                title TEXT NOT NULL,
+                description TEXT NOT NULL DEFAULT '',
+                priority INTEGER NOT NULL DEFAULT 0,
+                created_date INTEGER NOT NULL DEFAULT 0,
+                updated_date INTEGER NOT NULL DEFAULT 0,
+                frequency INTEGER NOT NULL DEFAULT 0,
+                frequency_days TEXT NOT NULL DEFAULT '',
+                completed_dates TEXT NOT NULL DEFAULT '',
+                streak_count INTEGER NOT NULL DEFAULT 0,
+                best_streak INTEGER NOT NULL DEFAULT 0,
+                reminder_enabled INTEGER NOT NULL DEFAULT 0,
+                reminder_time INTEGER NOT NULL DEFAULT 0,
+                alarmId INTEGER
+            )
+        """.trimIndent())
+
+        db.execSQL("CREATE INDEX idx_habits_created_date ON habits(created_date)")
+        db.execSQL("CREATE INDEX idx_habits_priority ON habits(priority)")
+        db.execSQL("CREATE INDEX idx_habits_updated_date ON habits(updated_date)")
+    }
+}

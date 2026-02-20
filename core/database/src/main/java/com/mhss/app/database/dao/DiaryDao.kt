@@ -8,13 +8,14 @@ import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
 import com.mhss.app.database.entity.DiaryEntryEntity
+import com.mhss.app.database.entity.DiaryListItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DiaryDao {
 
-    @Query("SELECT title, SUBSTR(content, 1, 150) AS content, created_date, updated_date, mood, id FROM diary")
-    fun getAllEntries(): Flow<List<DiaryEntryEntity>>
+    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date, updated_date, mood FROM diary")
+    fun getAllEntries(): Flow<List<DiaryListItem>>
 
     @Query("SELECT * FROM diary")
     suspend fun getAllFullEntries(): List<DiaryEntryEntity>
@@ -22,8 +23,8 @@ interface DiaryDao {
     @Query("SELECT * FROM diary WHERE id = :id")
     suspend fun getEntry(id: String): DiaryEntryEntity?
 
-    @Query("SELECT title, SUBSTR(content, 1, 100) AS content, created_date, updated_date, mood, id FROM diary WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
-    suspend fun getEntriesByTitle(query: String): List<DiaryEntryEntity>
+    @Query("SELECT id, title, SUBSTR(content, 1, 100) AS contentPreview, created_date, updated_date, mood FROM diary WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
+    suspend fun getEntriesByTitle(query: String): List<DiaryListItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntry(diary: DiaryEntryEntity)

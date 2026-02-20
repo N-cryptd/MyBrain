@@ -6,6 +6,9 @@ import com.mhss.app.database.entity.toNote
 import com.mhss.app.database.entity.toNoteEntity
 import com.mhss.app.database.entity.toNoteFolder
 import com.mhss.app.database.entity.toNoteFolderEntity
+import com.mhss.app.database.entity.toNote
+import com.mhss.app.database.entity.NoteListItem
+import com.mhss.app.database.entity.toNote
 import com.mhss.app.domain.model.Note
 import com.mhss.app.domain.model.NoteFolder
 import com.mhss.app.domain.repository.NoteRepository
