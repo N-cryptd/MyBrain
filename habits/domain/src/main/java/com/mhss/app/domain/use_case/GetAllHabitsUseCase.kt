@@ -24,7 +24,7 @@ class GetAllHabitsUseCase(
                         is Order.Alphabetical -> habits.sortedBy { it.title }
                         is Order.DateCreated -> habits.sortedBy { it.createdDate }
                         is Order.DateModified -> habits.sortedBy { it.updatedDate }
-                        is Order.Priority -> habits.sortedBy { it.priority }
+                        is Order.Priority -> habits.sortedBy { habit: Habit -> habit.priority }
                         else -> habits.sortedBy { it.createdDate }
                     }
                 }
@@ -33,7 +33,7 @@ class GetAllHabitsUseCase(
                         is Order.Alphabetical -> habits.sortedByDescending { it.title }
                         is Order.DateCreated -> habits.sortedByDescending { it.createdDate }
                         is Order.DateModified -> habits.sortedByDescending { it.updatedDate }
-                        is Order.Priority -> habits.sortedByDescending { it.priority }
+                        is Order.Priority -> habits.sortedByDescending { habit: Habit -> habit.priority }
                         else -> habits.sortedByDescending { it.createdDate }
                     }
                 }

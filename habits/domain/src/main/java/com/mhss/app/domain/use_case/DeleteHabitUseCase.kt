@@ -15,6 +15,6 @@ class DeleteHabitUseCase(
     suspend operator fun invoke(habit: Habit) {
         habit.alarmId?.let { deleteAlarmUseCase(it) }
         habitsRepository.deleteHabit(habit)
-        widgetUpdater.updateAll(WidgetUpdater.WidgetType.Habits)
+        widgetUpdater.updateAll(com.mhss.app.widget.WidgetUpdater.WidgetType.Habits)
     }
 }

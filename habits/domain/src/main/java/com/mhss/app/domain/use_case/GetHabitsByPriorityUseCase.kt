@@ -10,7 +10,7 @@ import org.koin.core.annotation.Single
 class GetHabitsByPriorityUseCase(
     private val habitsRepository: HabitRepository
 ) {
-    operator fun invoke(priority: Priority): Flow<List<Habit>> {
+    operator fun invoke(priority: com.mhss.app.domain.model.Priority): Flow<List<Habit>> {
         return habitsRepository.getHabitsByPriority(priority.value)
     }
 }

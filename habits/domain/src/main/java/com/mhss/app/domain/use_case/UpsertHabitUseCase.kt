@@ -40,7 +40,7 @@ class UpsertHabitUseCase(
         }
 
         habitsRepository.upsertHabit(finalHabit)
-        if (updateWidget) widgetUpdater.updateAll(WidgetUpdater.WidgetType.Habits)
+        if (updateWidget) widgetUpdater.updateAll(com.mhss.app.widget.WidgetUpdater.WidgetType.Habits)
 
         return finalHabit.alarmId != null || !finalHabit.reminderEnabled
     }

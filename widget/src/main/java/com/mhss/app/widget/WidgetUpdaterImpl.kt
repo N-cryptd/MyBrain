@@ -18,6 +18,8 @@ class WidgetUpdaterImpl(
             WidgetUpdater.WidgetType.Tasks -> {
                 TasksWidget().updateAll(context)
             }
+            WidgetUpdater.WidgetType.Habits -> {
+            }
         }
     }
 
