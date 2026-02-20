@@ -27,105 +27,9 @@ on:
         type: string
   release:
     types: [created]
-
+ 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      
-    - name: Cache Gradle packages
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: Run unit tests
-      run: ./gradlew test --no-daemon
-      
-    - name: Upload test results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: |
-          **/build/test-results/**/*.xml
-          **/build/reports/tests/
-        retention-days: 30
-
-  code-quality:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
-      
-    - name: Cache Gradle packages
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: Run Android Lint
-      run: ./gradlew lint --no-daemon
-      
-    - name: Run Detekt
-      run: ./gradlew detekt --no-daemon
-      
-    - name: Upload Lint results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: lint-results
-        path: |
-          **/build/reports/lint-results*.html
-          **/build/reports/lint-results*.xml
-        retention-days: 30
-        
-    - name: Upload Detekt results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: detekt-results
-        path: |
-          **/build/reports/detekt/
-        retention-days: 30
-
-  build-debug:
+  build:
     runs-on: ubuntu-latest
     outputs:
       version_name: ${{ steps.get_version.outputs.VERSION_NAME }}
@@ -165,7 +69,7 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-          
+           
     - name: Cache build outputs
       uses: actions/cache@v4
       with:
@@ -175,7 +79,7 @@ jobs:
         key: ${{ runner.os }}-build-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}-${{ github.sha }}
         restore-keys: |
           ${{ runner.os }}-build-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}-
-      
+           
     - name: Build Debug APK
       run: ./gradlew :app:assembleDebug --no-daemon
       
@@ -185,14 +89,14 @@ jobs:
         name: debug-apk
         path: app/build/outputs/apk/debug/*.apk
         retention-days: 30
-
+          
   build-release:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     outputs:
       version_name: ${{ steps.get_version.outputs.VERSION_NAME }}
       version_code: ${{ steps.get_version.outputs.VERSION_CODE }}
-    
+      
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -208,35 +112,6 @@ jobs:
       
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
-    - name: Get Version Info
-      id: get_version
-      run: |
-        VERSION_NAME=$(grep "versionName" app/build.gradle.kts | head -1 | sed 's/.*"\(.*\)".*/\1/')
-        VERSION_CODE=$(grep "versionCode" app/build.gradle.kts | head -1 | grep -o '[0-9]\+')
-        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_OUTPUT
-        echo "VERSION_CODE=$VERSION_CODE" >> $GITHUB_OUTPUT
-        echo "Version: $VERSION_NAME ($VERSION_CODE)"
-      
-    - name: Cache Gradle packages
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: Cache build outputs
-      uses: actions/cache@v4
-      with:
-        path: |
-          app/build
-          **/build
-        key: ${{ runner.os }}-build-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}-
       
     - name: Decode Keystore
       if: github.event_name != 'pull_request'
@@ -274,7 +149,7 @@ jobs:
         name: release-apk
         path: app/build/outputs/apk/release/*.apk
         retention-days: 30
-
+      
   create-github-release:
     needs: [build-debug, build-release]
     runs-on: ubuntu-latest
@@ -288,14 +163,7 @@ jobs:
       with:
         name: release-apk
         path: release-apk
-        continue-on-error: true
-        
-    - name: Download Debug APK
-      uses: actions/download-artifact@v4
-      with:
-        name: debug-apk
-        path: debug-apk
-        
+      
     - name: Prepare Release Files
       run: |
         mkdir -p release-assets
@@ -324,7 +192,6 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.release_info.outputs.TAG }}
-        files: release-assets/*.apk
         name: ${{ steps.release_info.outputs.NAME }}
         body: |
           ${{ steps.release_info.outputs.BODY }}
