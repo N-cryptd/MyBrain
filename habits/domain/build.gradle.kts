@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":core:preferences"))
     implementation(project(":core:alarm"))
     implementation(project(":core:widget"))
+    implementation(project(":tasks:domain"))
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.uuid)
     implementation(libs.kotlinx.serialization.json)

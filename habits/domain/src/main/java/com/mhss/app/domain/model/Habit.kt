@@ -20,12 +20,6 @@ data class Habit(
     val id: String = ""
 )
 
-enum class Priority(val value: Int) {
-    LOW(0),
-    MEDIUM(1),
-    HIGH(2)
-}
-
 enum class HabitFrequency(val value: Int) {
     DAILY(0),
     WEEKLY(1),
