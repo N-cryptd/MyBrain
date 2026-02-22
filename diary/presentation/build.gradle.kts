@@ -43,6 +43,7 @@ android {
 
 dependencies {
     implementation(project(":diary:domain"))
+    implementation(project(":core:database"))
     implementation(project(":core:util"))
     
     implementation(project(":core:ui"))

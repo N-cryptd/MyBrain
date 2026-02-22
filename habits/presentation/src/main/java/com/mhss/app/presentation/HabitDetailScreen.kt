@@ -54,6 +54,7 @@ import com.mhss.app.domain.model.HabitFrequency
 import com.mhss.app.domain.model.Priority
 import com.mhss.app.ui.R
 import com.mhss.app.presentation.util.color
+import com.mhss.app.presentation.util.titleRes
 import com.mhss.app.ui.components.common.DateTimeDialog
 import com.mhss.app.ui.components.common.MyBrainAppBar
 import com.mhss.app.ui.components.common.TimePickerDialog
@@ -103,7 +104,7 @@ fun HabitDetailScreen(
         }
     }
 
-    LaunchedEffect(uiState.navigateUp, uiState.alarmError) {
+    LaunchedEffect(uiState.navigateUp) {
         if (uiState.navigateUp) {
             openDialog = false
             navController.navigateUp()

@@ -17,6 +17,7 @@ import com.mhss.app.preferences.PrefsConstants
 import com.mhss.app.preferences.domain.model.Order
 import com.mhss.app.preferences.domain.model.OrderType
 import com.mhss.app.preferences.domain.model.intPreferencesKey
+import com.mhss.app.preferences.domain.model.toInt
 import com.mhss.app.preferences.domain.model.toOrder
 import com.mhss.app.preferences.domain.use_case.GetPreferenceUseCase
 import com.mhss.app.preferences.domain.use_case.SavePreferenceUseCase
@@ -93,6 +94,10 @@ class HabitsViewModel(
                 viewModelScope.launch {
                     searchHabits(event.query)
                 }
+            }
+
+            is HabitsScreenEvent.ShowDetails -> {
+                uiState = uiState.copy(navigateToDetail = event.habitId)
             }
         }
     }
