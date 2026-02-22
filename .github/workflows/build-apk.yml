@@ -151,7 +151,7 @@ jobs:
         retention-days: 30
       
   create-github-release:
-    needs: [build-debug, build-release]
+    needs: [build]
     runs-on: ubuntu-latest
     if: |
       github.event_name == 'release' || 
@@ -201,8 +201,8 @@ jobs:
           - Debug APK: Debug build for testing
           
           ## Version Info
-          - Version: ${{ needs.build-debug.outputs.version_name }}
-          - Version Code: ${{ needs.build-debug.outputs.version_code }}
+          - Version: ${{ needs.build.outputs.version_name }}
+          - Version Code: ${{ needs.build.outputs.version_code }}
           
           ## Changes in this Release
           ${{ github.event.release.body || github.event.inputs.release_notes || 'See commits for details' }}
