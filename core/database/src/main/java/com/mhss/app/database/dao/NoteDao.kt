@@ -16,10 +16,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface NoteDao {
 
-    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date, updated_date, pinned, folder_id FROM notes WHERE folder_id IS NULL")
+    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date AS createdDate, updated_date AS updatedDate, pinned, folder_id AS folderId FROM notes WHERE folder_id IS NULL")
     fun getAllFolderlessNotes(): Flow<List<NoteListItem>>
 
-    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date, updated_date, pinned, folder_id FROM notes")
+    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date AS createdDate, updated_date AS updatedDate, pinned, folder_id AS folderId FROM notes")
     fun getAllNotes(): Flow<List<NoteListItem>>
 
     @Query("SELECT * FROM notes")
@@ -28,10 +28,10 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE id = :id")
     suspend fun getNote(id: String): NoteEntity?
 
-    @Query("SELECT id, title, SUBSTR(content, 1, 100) AS contentPreview, created_date, updated_date, pinned, folder_id FROM notes WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
+    @Query("SELECT id, title, SUBSTR(content, 1, 100) AS contentPreview, created_date AS createdDate, updated_date AS updatedDate, pinned, folder_id AS folderId FROM notes WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
     suspend fun getNotesByTitle(query: String): List<NoteListItem>
 
-    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date, updated_date, pinned, folder_id FROM notes WHERE folder_id = :folderId")
+    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date AS createdDate, updated_date AS updatedDate, pinned, folder_id AS folderId FROM notes WHERE folder_id = :folderId")
     fun getNotesByFolder(folderId: String): Flow<List<NoteListItem>>
 
     @Query("DELETE FROM notes WHERE folder_id = :folderId")

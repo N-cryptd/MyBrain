@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface DiaryDao {
 
-    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date, updated_date, mood FROM diary")
+    @Query("SELECT id, title, SUBSTR(content, 1, 150) AS contentPreview, created_date AS createdDate, updated_date AS updatedDate, mood FROM diary")
     fun getAllEntries(): Flow<List<DiaryListItem>>
 
     @Query("SELECT * FROM diary")
@@ -23,7 +23,7 @@ interface DiaryDao {
     @Query("SELECT * FROM diary WHERE id = :id")
     suspend fun getEntry(id: String): DiaryEntryEntity?
 
-    @Query("SELECT id, title, SUBSTR(content, 1, 100) AS contentPreview, created_date, updated_date, mood FROM diary WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
+    @Query("SELECT id, title, SUBSTR(content, 1, 100) AS contentPreview, created_date AS createdDate, updated_date AS updatedDate, mood FROM diary WHERE title LIKE '%' || :query || '%' OR content LIKE '%' || :query || '%'")
     suspend fun getEntriesByTitle(query: String): List<DiaryListItem>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
