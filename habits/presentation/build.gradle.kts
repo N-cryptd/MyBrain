@@ -43,6 +43,7 @@ android {
 
 dependencies {
     implementation(project(":habits:domain"))
+    implementation(project(":tasks:domain"))
     implementation(project(":core:database"))
     implementation(project(":core:util"))
 
