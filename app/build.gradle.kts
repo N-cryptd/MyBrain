@@ -117,6 +117,7 @@ dependencies {
     implementation(project(":calendar:data"))
     implementation(project(":ai:data"))
     implementation(project(":settings:data"))
+    implementation(project(":habits:data"))
 
     implementation(project(":tasks:domain"))
     implementation(project(":calendar:domain"))
