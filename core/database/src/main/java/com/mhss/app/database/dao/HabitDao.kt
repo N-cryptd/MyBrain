@@ -50,13 +50,6 @@ interface HabitDao {
     @Query("UPDATE habits SET completed_dates = completed_dates || :timestamp WHERE id = :id")
     suspend fun addCompletedDate(id: String, timestamp: Long)
 
-    @Query("UPDATE habits SET completed_dates = (
-        SELECT CASE 
-            WHEN json_each.value = :timestamp THEN NULL 
-            ELSE json_each.value 
-        END 
-        FROM json_each(completed_dates) 
-        WHERE json_each.value != :timestamp
-    ) WHERE id = :id")
+    @Query("UPDATE habits SET completed_dates = (SELECT json_group_array(value) FROM json_each(completed_dates) WHERE value != :timestamp) WHERE id = :id")
     suspend fun removeCompletedDate(id: String, timestamp: Long)
 }

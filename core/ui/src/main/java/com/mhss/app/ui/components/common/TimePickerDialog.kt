@@ -44,7 +44,8 @@ fun TimePickerDialog(
             ) {
                 Text(stringResource(R.string.okay))
             }
-        }
+        },
+        title = { Text(stringResource(R.string.select_time)) }
     ) {
         Surface(
             shape = RoundedCornerShape(20.dp),

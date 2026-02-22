@@ -266,6 +266,7 @@
     <string name="select_days">Select days</string>
     <string name="reminder">Reminder</string>
     <string name="reminder_time">Reminder time</string>
+    <string name="select_time">Select time</string>
     <string name="statistics">Statistics</string>
     <string name="current_streak">Current streak</string>
     <string name="best_streak">Best streak</string>

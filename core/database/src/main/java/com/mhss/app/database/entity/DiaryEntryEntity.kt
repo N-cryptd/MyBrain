@@ -34,8 +34,11 @@ data class DiaryEntryEntity(
 data class DiaryListItem(
     val id: String,
     val title: String,
+    @ColumnInfo(name = "content_preview")
     val contentPreview: String,
+    @ColumnInfo(name = "created_date")
     val createdDate: Long,
+    @ColumnInfo(name = "updated_date")
     val updatedDate: Long,
     val mood: Mood
 )
