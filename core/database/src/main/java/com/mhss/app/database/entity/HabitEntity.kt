@@ -49,37 +49,3 @@ data class HabitEntity(
     @Serializable(IdSerializer::class)
     val id: String
 )
-
-fun HabitEntity.toHabit() = Habit(
-    title = title,
-    description = description,
-    priority = Priority.entries.firstOrNull { it.value == priority } ?: Priority.LOW,
-    createdDate = createdDate,
-    updatedDate = updatedDate,
-    frequency = HabitFrequency.entries.firstOrNull { it.value == frequency } ?: HabitFrequency.DAILY,
-    frequencyDays = frequencyDays,
-    completedDates = completedDates,
-    streakCount = streakCount,
-    bestStreak = bestStreak,
-    reminderEnabled = reminderEnabled,
-    reminderTime = reminderTime,
-    alarmId = alarmId,
-    id = id
-)
-
-fun Habit.toHabitEntity() = HabitEntity(
-    title = title,
-    description = description,
-    priority = priority.value,
-    createdDate = createdDate,
-    updatedDate = updatedDate,
-    frequency = frequency.value,
-    frequencyDays = frequencyDays,
-    completedDates = completedDates,
-    streakCount = streakCount,
-    bestStreak = bestStreak,
-    reminderEnabled = reminderEnabled,
-    reminderTime = reminderTime,
-    alarmId = alarmId,
-    id = id
-)

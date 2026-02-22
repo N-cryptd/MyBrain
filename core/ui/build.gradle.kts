@@ -48,6 +48,7 @@ dependencies {
 
     implementation(project(":core:util"))
     implementation(project(":core:preferences"))
+    implementation(project(":core:database"))
     implementation(platform(libs.compose.bom))
 
     implementation(libs.androidx.core.ktx)
