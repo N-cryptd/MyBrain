@@ -36,7 +36,7 @@ class HabitsViewModel(
     private val deleteHabit: DeleteHabitUseCase,
     private val completeHabit: CompleteHabitUseCase,
     private val uncompleteHabit: UncompleteHabitUseCase,
-    private val searchHabits: SearchHabitsUseCase,
+    private val searchHabitsUseCase: SearchHabitsUseCase,
     getPreference: GetPreferenceUseCase,
     private val savePreference: SavePreferenceUseCase
 ) : ViewModel() {
@@ -132,7 +132,7 @@ class HabitsViewModel(
 
     private fun searchHabits(query: String) {
         searchHabitsJob?.cancel()
-        searchHabitsJob = searchHabits(query).onEach { habits ->
+        searchHabitsJob = searchHabitsUseCase(query).onEach { habits ->
             uiState = uiState.copy(
                 searchHabits = habits
             )

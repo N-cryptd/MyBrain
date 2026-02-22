@@ -83,7 +83,7 @@ fun HabitDetailScreen(
     var description by remember { mutableStateOf("") }
     var priority by remember { mutableStateOf(Priority.LOW) }
     var frequency by remember { mutableStateOf(HabitFrequency.DAILY) }
-    var frequencyDays by remember { mutableStateListOf<Int>() }
+    val frequencyDays = remember { mutableStateListOf<Int>() }
     var reminderEnabled by remember { mutableStateOf(false) }
     var reminderTime by remember { mutableLongStateOf(0L) }
 
