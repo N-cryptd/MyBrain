@@ -111,11 +111,11 @@ fun HabitsScreen(
             )
         ) {
             AddHabitBottomSheetContent(
-                onAddHabit = { habit ->
-                    viewModel.onEvent(HabitsScreenEvent.Navigate(habit.id))
+                onCreateHabit = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) { openSheet = false }
                     }
+                    navController.navigate(Screen.HabitDetailScreen(null))
                 },
                 onCancel = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {

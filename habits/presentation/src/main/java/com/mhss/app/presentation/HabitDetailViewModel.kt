@@ -87,7 +87,7 @@ class HabitDetailViewModel(
                         return@launch
                     }
 
-                    val habit = Habit(
+                    val habit = com.mhss.app.domain.model.Habit(
                         title = _uiState.value.title,
                         description = _uiState.value.description,
                         priority = _uiState.value.priority,

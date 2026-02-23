@@ -1,7 +1,6 @@
 package com.mhss.app.presentation
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,10 +34,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,7 +64,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-@Suppress("AssignedValueIsNeverRead")
 @Composable
 fun HabitDetailScreen(
     navController: NavHostController,
@@ -77,63 +73,15 @@ fun HabitDetailScreen(
     val alarmPermissionState = rememberPermissionState(Permission.SCHEDULE_ALARMS)
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = uiState.snackbarHostState
-    var openDialog by rememberSaveable { mutableStateOf(false) }
-
-    var title by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    var priority by remember { mutableStateOf(Priority.LOW) }
-    var frequency by remember { mutableStateOf(HabitFrequency.DAILY) }
-    val frequencyDays = remember { mutableStateListOf<Int>() }
-    var reminderEnabled by remember { mutableStateOf(false) }
-    var reminderTime by remember { mutableLongStateOf(0L) }
+    var openDialog by remember { mutableStateOf(false) }
 
     val priorities = listOf(Priority.LOW, Priority.MEDIUM, Priority.HIGH)
     val daysOfWeek = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-
-    LaunchedEffect(uiState.habit) {
-        val habit = uiState.habit
-        if (habit != null) {
-            title = habit.title
-            description = habit.description
-            priority = habit.priority
-            frequency = habit.frequency
-            frequencyDays.clear()
-            frequencyDays.addAll(habit.frequencyDays)
-            reminderEnabled = habit.reminderEnabled
-            reminderTime = habit.reminderTime
-        }
-    }
 
     LaunchedEffect(uiState.navigateUp) {
         if (uiState.navigateUp) {
             openDialog = false
             navController.navigateUp()
-        }
-    }
-
-    LifecycleStartEffect(Unit) {
-        onStopOrDispose {
-            if (!viewModel.uiState.value.navigateUp && title.isNotBlank()) {
-                val habit = uiState.habit?.copy(
-                    title = title,
-                    description = description,
-                    priority = priority,
-                    frequency = frequency,
-                    frequencyDays = frequencyDays,
-                    reminderEnabled = reminderEnabled,
-                    reminderTime = reminderTime,
-                    updatedDate = System.currentTimeMillis()
-                ) ?: com.mhss.app.domain.model.Habit(
-                    title = title,
-                    description = description,
-                    priority = priority,
-                    frequency = frequency,
-                    frequencyDays = frequencyDays,
-                    reminderEnabled = reminderEnabled,
-                    reminderTime = reminderTime
-                )
-                viewModel.onEvent(HabitDetailEvent.SaveHabit(habit))
-            }
         }
     }
 
@@ -155,28 +103,31 @@ fun HabitDetailScreen(
     ) { paddingValues ->
         HabitDetailsContent(
             modifier = Modifier.padding(paddingValues),
-            title = title,
-            description = description,
-            priority = priority,
-            frequency = frequency,
-            frequencyDays = frequencyDays,
-            reminderEnabled = reminderEnabled,
-            reminderTime = reminderTime,
+            title = uiState.title,
+            description = uiState.description,
+            priority = uiState.priority,
+            frequency = uiState.frequency,
+            frequencyDays = uiState.frequencyDays,
+            reminderEnabled = uiState.reminderEnabled,
+            reminderTime = uiState.reminderTime,
             priorities = priorities,
             daysOfWeek = daysOfWeek,
-            onTitleChange = { title = it },
-            onDescriptionChange = { description = it },
-            onPriorityChange = { priority = it },
-            onFrequencyChange = { frequency = it },
+            onTitleChange = { viewModel.onEvent(HabitDetailEvent.UpdateTitle(it)) },
+            onDescriptionChange = { viewModel.onEvent(HabitDetailEvent.UpdateDescription(it)) },
+            onPriorityChange = { viewModel.onEvent(HabitDetailEvent.UpdatePriority(it)) },
+            onFrequencyChange = { viewModel.onEvent(HabitDetailEvent.UpdateFrequency(it)) },
             onFrequencyDayToggle = { day ->
-                if (frequencyDays.contains(day)) {
-                    frequencyDays.remove(day)
+                val newDays = if (uiState.frequencyDays.contains(day)) {
+                    uiState.frequencyDays - day
                 } else {
-                    frequencyDays.add(day)
+                    uiState.frequencyDays + day
                 }
+                viewModel.onEvent(HabitDetailEvent.UpdateFrequencyDays(newDays))
             },
-            onReminderEnabledChange = { reminderEnabled = it },
-            onReminderTimeChange = { reminderTime = it }
+            onReminderEnabledChange = { viewModel.onEvent(HabitDetailEvent.UpdateReminderEnabled(it)) },
+            onReminderTimeChange = { viewModel.onEvent(HabitDetailEvent.UpdateReminderTime(it)) },
+            onSave = { viewModel.onEvent(HabitDetailEvent.SaveHabit) },
+            canSave = uiState.title.isNotBlank()
         )
     }
 
@@ -237,7 +188,9 @@ fun HabitDetailsContent(
     onFrequencyChange: (HabitFrequency) -> Unit,
     onFrequencyDayToggle: (Int) -> Unit,
     onReminderEnabledChange: (Boolean) -> Unit,
-    onReminderTimeChange: (Long) -> Unit
+    onReminderTimeChange: (Long) -> Unit,
+    onSave: () -> Unit,
+    canSave: Boolean
 ) {
     Column(
         modifier
@@ -355,6 +308,14 @@ fun HabitDetailsContent(
             shape = RoundedCornerShape(15.dp),
             modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(Modifier.height(24.dp))
+        Button(
+            onClick = onSave,
+            enabled = canSave
+        ) {
+            Text(stringResource(R.string.save))
+        }
     }
 }
 
@@ -483,11 +444,9 @@ fun formatTime(timeInMillis: Long): String {
 
 @Composable
 fun AddHabitBottomSheetContent(
-    onAddHabit: (com.mhss.app.domain.model.Habit) -> Unit,
+    onCreateHabit: () -> Unit,
     onCancel: () -> Unit
 ) {
-    var title by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -500,8 +459,8 @@ fun AddHabitBottomSheetContent(
         )
         Spacer(modifier = Modifier.height(16.dp))
         androidx.compose.material3.OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
+            value = "",
+            onValueChange = { },
             label = { Text(stringResource(R.string.title)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -516,19 +475,8 @@ fun AddHabitBottomSheetContent(
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(
-                onClick = {
-                    if (title.isNotBlank()) {
-                        onAddHabit(
-                            com.mhss.app.domain.model.Habit(
-                                title = title,
-                                description = "",
-                                priority = Priority.LOW,
-                                frequency = HabitFrequency.DAILY
-                            )
-                        )
-                    }
-                },
-                enabled = title.isNotBlank()
+                onClick = onCreateHabit,
+                enabled = true
             ) {
                 Text(stringResource(R.string.save))
             }

@@ -18,12 +18,40 @@ val toolsSystemMessage = """
 val String.summarizeNotePrompt: String
     get() = """
         Summarize this note in bullet points.
-        Respond with the summary only and don't say anything else.
+        IMPORTANT: DO NOT include any reasoning, analysis, thinking process, or phrases like "Here's a summary" or "Let me think".
+        Respond ONLY with the bullet point summary itself.
         Use Markdown for formatting.
         Respond using the same language as the original note language.
         Note content:
         $this
+        
         Summary:
+    """.trimIndent()
+
+val String.autoFormatNotePrompt: String
+    get() = """
+        Format this note in a more readable way.
+        Include headings, bullet points, and other formatting.
+        IMPORTANT: DO NOT include any reasoning, analysis, thinking process, or phrases like "Here's the formatted note" or "Let me format this".
+        Respond ONLY with the formatted note itself.
+        Use Markdown for formatting.
+        Respond using the same language as the original note language.
+        Note content:
+        $this
+        
+        Formatted note:
+    """.trimIndent()
+
+val String.correctSpellingNotePrompt: String
+    get() = """
+        Correct spelling and grammar errors in this note.
+        IMPORTANT: DO NOT include any reasoning, analysis, thinking process, or phrases like "Here's the corrected note" or "Let me check this".
+        Respond ONLY with the corrected note itself.
+        Respond using the same language as the original note language.
+        Note content:
+        $this
+        
+        Corrected note:
     """.trimIndent()
 
 val String.autoFormatNotePrompt: String
