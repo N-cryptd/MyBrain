@@ -47,7 +47,7 @@ class TaskToolSetTest {
             Task(title = "Task 1", description = "Description 1", id = "task-1"),
             Task(title = "Task 2", description = "Description 2", id = "task-2")
         )
-        coEvery { searchTasksByName("test").first() } returns expectedTasks
+        coEvery { searchTasksByName("test") } returns flowOf(expectedTasks)
         
         val result = taskToolSet.searchTasks("test")
         
@@ -65,7 +65,7 @@ class TaskToolSetTest {
             title = "Test Task",
             description = "Test Description",
             priority = Priority.HIGH,
-            dueDate = "2025-01-15T10:00:00",
+            dueDate = "10:00 15-01-2025",
             subTasks = null,
             recurring = false,
             frequency = TaskFrequency.DAILY,
@@ -110,9 +110,10 @@ class TaskToolSetTest {
             id = "task-123"
         )
         coEvery { getTask("task-123") } returns task
-        
+        coEvery { updateTaskCompletedUseCase(any(), any()) } just Runs
+
         taskToolSet.updateTaskCompleted("task-123", true)
-        
+
         coVerify { getTask("task-123") }
         coVerify { updateTaskCompletedUseCase(task, true) }
     }
@@ -147,13 +148,13 @@ class TaskToolSetTest {
                 title = "Task 1",
                 description = "Description 1",
                 priority = Priority.MEDIUM,
-                dueDate = "2025-01-15T10:00:00"
+                dueDate = "10:00 15-01-2025"
             ),
             TaskInput(
                 title = "Task 2",
                 description = "Description 2",
                 priority = Priority.LOW,
-                dueDate = "2025-01-16T14:30:00"
+                dueDate = "14:30 16-01-2025"
             )
         )
         coEvery { upsertTasks(any()) } returns Unit

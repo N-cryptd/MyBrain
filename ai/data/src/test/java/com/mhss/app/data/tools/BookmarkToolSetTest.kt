@@ -30,49 +30,50 @@ class BookmarkToolSetTest {
 
     @Test
     fun testCreateBookmark() = runTest {
-        val bookmarkId = 123L
-        coEvery { addBookmark(any()) } returns bookmarkId
-        
+        val bookmarkId = "550e8400-e29b-41d4-a716-446655440000"
+        coEvery { addBookmark(any()) } returns 1L  // Repository returns row ID
+
         val result = bookmarkToolSet.createBookmark(
             url = "https://example.com",
             title = "Example Site",
             description = "An example website"
         )
-        
+
         assertNotNull("Result should not be null", result)
-        assertEquals("Should return the bookmark ID", bookmarkId, result.createdBookmarkId)
+        assertEquals("Should return a bookmark ID", 36, result.createdBookmarkId.length)
+        assertTrue("Should return a valid UUID", result.createdBookmarkId.matches(Regex("[0-9a-fA-F-]{36}")))
         coVerify { addBookmark(any()) }
     }
 
     @Test
     fun testCreateBookmarkMinimal() = runTest {
-        val bookmarkId = 456L
-        coEvery { addBookmark(any()) } returns bookmarkId
-        
+        coEvery { addBookmark(any()) } returns 2L  // Repository returns row ID
+
         val result = bookmarkToolSet.createBookmark(
             url = "https://example.com",
             title = "",
             description = ""
         )
-        
+
         assertNotNull("Result should not be null", result)
-        assertEquals("Should return the bookmark ID", bookmarkId, result.createdBookmarkId)
+        assertEquals("Should return a bookmark ID", 36, result.createdBookmarkId.length)
+        assertTrue("Should return a valid UUID", result.createdBookmarkId.matches(Regex("[0-9a-fA-F-]{36}")))
         coVerify { addBookmark(any()) }
     }
 
     @Test
     fun testCreateBookmarkWithTitleOnly() = runTest {
-        val bookmarkId = 789L
-        coEvery { addBookmark(any()) } returns bookmarkId
-        
+        coEvery { addBookmark(any()) } returns 3L  // Repository returns row ID
+
         val result = bookmarkToolSet.createBookmark(
             url = "https://github.com",
             title = "GitHub",
             description = ""
         )
-        
+
         assertNotNull("Result should not be null", result)
-        assertEquals("Should return the bookmark ID", bookmarkId, result.createdBookmarkId)
+        assertEquals("Should return a bookmark ID", 36, result.createdBookmarkId.length)
+        assertTrue("Should return a valid UUID", result.createdBookmarkId.matches(Regex("[0-9a-fA-F-]{36}")))
         coVerify { addBookmark(any()) }
     }
 

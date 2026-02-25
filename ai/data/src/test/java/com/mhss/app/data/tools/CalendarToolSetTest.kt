@@ -13,6 +13,7 @@ import com.mhss.app.preferences.domain.model.stringSetPreferencesKey
 import com.mhss.app.preferences.domain.use_case.GetPreferenceUseCase
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -68,8 +69,8 @@ class CalendarToolSetTest {
         coEvery { getEventsWithinRangeUseCase(1705272000000, 1705293600000, emptyList()) } returns expectedEvents
         
         val result = calendarToolSet.getEventsWithinRange(
-            startDateTime = "2024-01-15T09:00:00",
-            endDateTime = "2024-01-15T15:00:00"
+            startDateTime = "09:00 15-01-2024",
+            endDateTime = "15:00 15-01-2024"
         )
         
         assertNotNull("Result should not be null", result)
@@ -103,8 +104,8 @@ class CalendarToolSetTest {
         
         val result = calendarToolSet.searchEventsByNameWithinRange(
             eventName = "meeting",
-            startDateTime = "2024-01-15T09:00:00",
-            endDateTime = "2024-01-16T09:00:00"
+            startDateTime = "09:00 15-01-2024",
+            endDateTime = "09:00 16-01-2024"
         )
         
         assertNotNull("Result should not be null", result)
@@ -119,8 +120,8 @@ class CalendarToolSetTest {
         
         val result = calendarToolSet.createEvent(
             title = "New Event",
-            start = "2024-01-15T10:00:00",
-            end = "2024-01-15T11:00:00",
+            start = "10:00 15-01-2024",
+            end = "11:00 15-01-2024",
             calendarId = 1,
             description = "Event description",
             location = "Office",
@@ -141,8 +142,8 @@ class CalendarToolSetTest {
         
         val result = calendarToolSet.createEvent(
             title = "Weekly Meeting",
-            start = "2024-01-15T10:00:00",
-            end = "2024-01-15T11:00:00",
+            start = "10:00 15-01-2024",
+            end = "11:00 15-01-2024",
             calendarId = 2,
             description = "Weekly team sync",
             location = "Conference Room",
@@ -161,14 +162,14 @@ class CalendarToolSetTest {
         val eventInputs = listOf(
             CalendarEventInput(
                 title = "Event 1",
-                start = "2024-01-15T10:00:00",
-                end = "2024-01-15T11:00:00",
+                start = "10:00 15-01-2024",
+                end = "11:00 15-01-2024",
                 calendarId = 1
             ),
             CalendarEventInput(
                 title = "Event 2",
-                start = "2024-01-16T14:00:00",
-                end = "2024-01-16T15:00:00",
+                start = "14:00 16-01-2024",
+                end = "15:00 16-01-2024",
                 calendarId = 1
             )
         )
@@ -195,8 +196,8 @@ class CalendarToolSetTest {
             )
         )
         
-        coEvery { 
-            getPreference(stringSetPreferencesKey(PrefsConstants.EXCLUDED_CALENDARS_KEY), emptySet()) 
+        every {
+            getPreference(any<PrefsKey<Set<String>>>(), any())
         } returns flowOf(emptySet<String>())
         coEvery { getAllCalendarsUseCase(emptyList()) } returns expectedCalendars
         
