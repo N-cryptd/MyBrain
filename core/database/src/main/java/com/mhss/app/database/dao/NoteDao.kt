@@ -11,6 +11,7 @@ import androidx.room.Upsert
 import com.mhss.app.database.entity.NoteEntity
 import com.mhss.app.database.entity.NoteListItem
 import com.mhss.app.database.entity.NoteFolderEntity
+import com.mhss.app.database.entity.NoteLinkEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -78,4 +79,36 @@ interface NoteDao {
 
     @Query("SELECT * FROM note_folders WHERE name LIKE '%' || :name || '%'")
     fun searchFolderByName(name: String): List<NoteFolderEntity>
+
+    @Query("SELECT * FROM note_links WHERE from_note_id = :noteId")
+    suspend fun getLinksFromNote(noteId: String): List<NoteLinkEntity>
+
+    @Query("""
+        SELECT n.* FROM notes n
+        INNER JOIN note_links nl ON n.id = nl.to_note_id
+        WHERE nl.from_note_id = :noteId
+    """)
+    suspend fun getLinkedNotes(noteId: String): List<NoteEntity>
+
+    @Query("""
+        SELECT n.* FROM notes n
+        INNER JOIN note_links nl ON n.id = nl.from_note_id
+        WHERE nl.to_note_id = :noteId
+    """)
+    suspend fun getBacklinkNotes(noteId: String): List<NoteEntity>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertLink(link: NoteLinkEntity)
+
+    @Delete
+    suspend fun deleteLink(link: NoteLinkEntity)
+
+    @Query("DELETE FROM note_links WHERE from_note_id = :noteId AND to_note_id = :toNoteId")
+    suspend fun deleteSpecificLink(noteId: String, toNoteId: String)
+
+    @Query("DELETE FROM note_links WHERE from_note_id = :noteId")
+    suspend fun deleteAllLinksFromNote(noteId: String)
+
+    @Query("DELETE FROM note_links WHERE to_note_id = :noteId")
+    suspend fun deleteAllLinksToNote(noteId: String)
 }

@@ -7,6 +7,9 @@ const val SEARCH_NOTES_TOOL = "searchNotes"
 const val CREATE_NOTE_TOOL = "createNote"
 const val CREATE_MULTIPLE_NOTES_TOOL = "createMultipleNotes"
 const val GET_NOTE_BY_ID_TOOL = "getNoteById"
+const val GET_LINKED_NOTES_TOOL = "getLinkedNotes"
+const val GET_BACKLINKS_TOOL = "getBacklinks"
+const val CREATE_NOTE_LINK_TOOL = "createNoteLink"
 
 // TaskToolSet
 const val SEARCH_TASKS_TOOL = "searchTasks"

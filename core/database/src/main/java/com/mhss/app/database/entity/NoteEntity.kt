@@ -27,6 +27,12 @@ data class NoteEntity(
     @SerialName("folderId")
     @Serializable(IdSerializer::class)
     val folderId: String? = null,
+    @ColumnInfo(name = "linked_note_ids")
+    @SerialName("linkedNoteIds")
+    val linkedNoteIds: String = "",
+    @ColumnInfo(name = "backlink_count")
+    @SerialName("backlinkCount")
+    val backlinkCount: Int = 0,
     @PrimaryKey
     @SerialName("id")
     @Serializable(IdSerializer::class)
@@ -41,7 +47,9 @@ data class NoteListItem(
     val createdDate: Long,
     val updatedDate: Long,
     val pinned: Boolean,
-    val folderId: String?
+    val folderId: String?,
+    val linkedNoteIds: String = "",
+    val backlinkCount: Int = 0
 )
 
 fun NoteEntity.toNote(): Note {
@@ -52,6 +60,8 @@ fun NoteEntity.toNote(): Note {
         updatedDate = updatedDate,
         pinned = pinned,
         folderId = folderId,
+        linkedNoteIds = linkedNoteIds,
+        backlinkCount = backlinkCount,
         id = id,
     )
 }
@@ -64,6 +74,8 @@ fun Note.toNoteEntity(): NoteEntity {
         updatedDate = updatedDate,
         pinned = pinned,
         folderId = folderId,
+        linkedNoteIds = linkedNoteIds,
+        backlinkCount = backlinkCount,
         id = id
     )
 }
@@ -76,6 +88,8 @@ fun NoteListItem.toNote(): Note {
         updatedDate = updatedDate,
         pinned = pinned,
         folderId = folderId,
+        linkedNoteIds = linkedNoteIds,
+        backlinkCount = backlinkCount,
         id = id,
     )
 }

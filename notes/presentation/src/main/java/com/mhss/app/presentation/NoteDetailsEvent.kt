@@ -15,6 +15,9 @@ sealed class NoteDetailsEvent {
     data class UpdateContent(val content: String): NoteDetailsEvent()
     data class UpdateFolder(val folder: NoteFolder?): NoteDetailsEvent()
     data class UpdatePinned(val pinned: Boolean): NoteDetailsEvent()
+    data object ToggleBacklinksPanel : NoteDetailsEvent()
+    data object ShowInsertLinkDialog : NoteDetailsEvent()
+    data object DismissInsertLinkDialog : NoteDetailsEvent()
 }
 
 sealed interface AiAction

@@ -9,10 +9,12 @@ import com.mhss.app.database.entity.toNoteFolderEntity
 import com.mhss.app.database.entity.toNote
 import com.mhss.app.database.entity.NoteListItem
 import com.mhss.app.database.entity.toNote
+import com.mhss.app.database.entity.NoteLinkEntity
 import com.mhss.app.domain.model.Note
 import com.mhss.app.domain.model.NoteFolder
 import com.mhss.app.domain.repository.NoteRepository
 import com.mhss.app.util.errors.NoteException
+import com.mhss.app.util.linking.NoteLinkingEngine
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -25,6 +27,8 @@ class RoomNoteRepositoryImpl(
     private val noteDao: NoteDao,
     @Named("ioDispatcher") private val ioDispatcher: CoroutineDispatcher
 ) : NoteRepository {
+    
+    private val linkingEngine = NoteLinkingEngine()
 
     override fun getAllFolderlessNotes(): Flow<List<Note>> {
         return noteDao.getAllFolderlessNotes()
@@ -136,6 +140,52 @@ class RoomNoteRepositoryImpl(
     override suspend fun searchFoldersByName(name: String): List<NoteFolder> {
         return withContext(ioDispatcher) {
             noteDao.searchFolderByName(name).map { it.toNoteFolder() }
+        }
+    }
+
+    override suspend fun getLinkedNotes(noteId: String): List<Note> {
+        return withContext(ioDispatcher) {
+            noteDao.getLinkedNotes(noteId).map { it.toNote() }
+        }
+    }
+
+    override suspend fun getBacklinks(noteId: String): List<Note> {
+        return withContext(ioDispatcher) {
+            noteDao.getBacklinkNotes(noteId).map { it.toNote() }
+        }
+    }
+
+    override suspend fun createLink(fromNoteId: String, toNoteId: String) {
+        withContext(ioDispatcher) {
+            val link = NoteLinkEntity(
+                fromNoteId = fromNoteId,
+                toNoteId = toNoteId,
+                createdDate = System.currentTimeMillis(),
+                id = Uuid.random().toString()
+            )
+            noteDao.insertLink(link)
+        }
+    }
+
+    override suspend fun removeLink(fromNoteId: String, toNoteId: String) {
+        withContext(ioDispatcher) {
+            noteDao.deleteSpecificLink(fromNoteId, toNoteId)
+        }
+    }
+
+    override suspend fun updateNoteLinks(noteId: String, content: String, allNotes: List<Note>) {
+        withContext(ioDispatcher) {
+            val links = linkingEngine.detectLinks(content)
+            val linkedNoteIds = links.mapNotNull { link ->
+                linkingEngine.resolveLink(link.text, allNotes)?.id
+            }
+            val linkedNoteIdsJson = linkingEngine.formatLinkedNoteIds(linkedNoteIds)
+            
+            val note = noteDao.getNote(noteId)
+            if (note != null) {
+                val updatedNote = note.copy(linkedNoteIds = linkedNoteIdsJson)
+                noteDao.upsertNote(updatedNote)
+            }
         }
     }
 }

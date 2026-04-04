@@ -14,6 +14,9 @@ import com.mhss.app.domain.model.NoteFolder
 import com.mhss.app.domain.summarizeNotePrompt
 import com.mhss.app.domain.use_case.DeleteNoteUseCase
 import com.mhss.app.domain.use_case.GetAllNoteFoldersUseCase
+import com.mhss.app.domain.use_case.GetAllNotesUseCase
+import com.mhss.app.domain.use_case.GetBacklinksUseCase
+import com.mhss.app.domain.use_case.GetLinkedNotesUseCase
 import com.mhss.app.domain.use_case.GetNoteFolderUseCase
 import com.mhss.app.domain.use_case.GetNoteUseCase
 import com.mhss.app.domain.use_case.SendAiPromptUseCase
@@ -51,6 +54,9 @@ class NoteDetailsViewModel(
     private val getPreference: GetPreferenceUseCase,
     private val getAllFolders: GetAllNoteFoldersUseCase,
     private val getNoteFolder: GetNoteFolderUseCase,
+    private val getAllNotes: GetAllNotesUseCase,
+    private val getLinkedNotesUseCase: GetLinkedNotesUseCase,
+    private val getBacklinksUseCase: GetBacklinksUseCase,
     private val sendAiPrompt: SendAiPromptUseCase,
     @Named("applicationScope") private val applicationScope: CoroutineScope,
     id: String,
@@ -59,6 +65,9 @@ class NoteDetailsViewModel(
 
     private val _noteUiState = MutableStateFlow(UiState())
     val noteUiState = _noteUiState.asStateFlow()
+    
+    private val _allNotes = MutableStateFlow<List<Note>>(emptyList())
+    val allNotes = _allNotes.asStateFlow()
 
     var title by mutableStateOf("")
         private set
@@ -94,16 +103,34 @@ class NoteDetailsViewModel(
             if (note != null) {
                 title = note.title
                 content = note.content
-            }
+                
+                val linkedNotes = if (note.id.isNotBlank()) {
+                    getLinkedNotesUseCase(note.id)
+                } else {
+                    emptyList()
+                }
+                
+                val backlinks = if (note.id.isNotBlank()) {
+                    getBacklinksUseCase(note.id)
+                } else {
+                    emptyList()
+                }
+                
+                val allNotesList = getAllNotes().first()
 
-            _noteUiState.update {
-                it.copy(
-                    note = note?.copy(folderId = folder?.id ?: note.folderId),
-                    folder = folder,
-                    folders = folders,
-                    readingMode = note != null,
-                    pinned = note?.pinned ?: false
-                )
+                _allNotes.value = allNotesList
+
+                _noteUiState.update {
+                    it.copy(
+                        note = note?.copy(folderId = folder?.id ?: note.folderId),
+                        folder = folder,
+                        folders = folders,
+                        readingMode = note != null,
+                        pinned = note?.pinned ?: false,
+                        linkedNotes = linkedNotes,
+                        backlinks = backlinks
+                    )
+                }
             }
         }
         viewModelScope.launch(exceptionHandler) {
@@ -150,6 +177,18 @@ class NoteDetailsViewModel(
             is NoteDetailsEvent.UpdatePinned -> {
                 _noteUiState.update { it.copy(pinned = event.pinned) }
                 autoSaveNote()
+            }
+
+            is NoteDetailsEvent.ToggleBacklinksPanel -> {
+                _noteUiState.update { it.copy(showBacklinksPanel = !it.showBacklinksPanel) }
+            }
+
+            is NoteDetailsEvent.ShowInsertLinkDialog -> {
+                _noteUiState.update { it.copy(showInsertLinkDialog = true) }
+            }
+
+            is NoteDetailsEvent.DismissInsertLinkDialog -> {
+                _noteUiState.update { it.copy(showInsertLinkDialog = false) }
             }
 
             is AiAction -> aiActionJob = viewModelScope.launch {
@@ -257,6 +296,10 @@ class NoteDetailsViewModel(
         val folders: List<NoteFolder> = emptyList(),
         val folder: NoteFolder? = null,
         val pinned: Boolean = false,
+        val linkedNotes: List<Note> = emptyList(),
+        val backlinks: List<Note> = emptyList(),
+        val showInsertLinkDialog: Boolean = false,
+        val showBacklinksPanel: Boolean = false,
         val snackbarHostState: SnackbarHostState = SnackbarHostState()
     )
 

@@ -48,6 +48,7 @@ fun NoteCard(
         content = note.content,
         updatedDate = note.updatedDate,
         pinned = note.pinned,
+        backlinkCount = note.backlinkCount,
         onClick = { onClick(note) }
     )
 }
@@ -64,6 +65,7 @@ fun NoteCard(
         content = note.contentPreview,
         updatedDate = note.updatedDate,
         pinned = note.pinned,
+        backlinkCount = note.backlinkCount,
         onClick = { onClick(note) }
     )
 }
@@ -75,6 +77,7 @@ private fun NoteCardInternal(
     content: String,
     updatedDate: Long,
     pinned: Boolean,
+    backlinkCount: Int = 0,
     onClick: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -119,11 +122,36 @@ private fun NoteCardInternal(
                 typography = previewMarkdownTypography()
             )
             Spacer(Modifier.height(8.dp))
-            Text(
-                text = formattedDate,
-                style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray),
-                modifier = Modifier.align(Alignment.End)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = formattedDate,
+                    style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray)
+                )
+                    if (backlinkCount > 0) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_open_link),
+                                contentDescription = stringResource(R.string.backlinks),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(12.dp)
+                            )
+                        Text(
+                            text = backlinkCount.toString(),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 }

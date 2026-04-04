@@ -34,4 +34,14 @@ interface NoteRepository {
 
     suspend fun searchFoldersByName(name: String): List<NoteFolder>
 
+    suspend fun getLinkedNotes(noteId: String): List<Note>
+
+    suspend fun getBacklinks(noteId: String): List<Note>
+
+    suspend fun createLink(fromNoteId: String, toNoteId: String)
+
+    suspend fun removeLink(fromNoteId: String, toNoteId: String)
+
+    suspend fun updateNoteLinks(noteId: String, content: String, allNotes: List<Note>)
+
 }

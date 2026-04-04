@@ -10,5 +10,7 @@ data class Note(
     val updatedDate: Long = 0L,
     val pinned: Boolean = false,
     val folderId: String? = null,
+    val linkedNoteIds: String = "",
+    val backlinkCount: Int = 0,
     val id: String = "",
 )

@@ -7,8 +7,12 @@ import com.mhss.app.data.nowMillis
 import com.mhss.app.domain.model.Note
 import com.mhss.app.domain.model.NoteFolder
 import com.mhss.app.domain.use_case.CreateNoteFolderUseCase
+import com.mhss.app.domain.use_case.CreateNoteLinkUseCase
+import com.mhss.app.domain.use_case.GetBacklinksUseCase
+import com.mhss.app.domain.use_case.GetLinkedNotesUseCase
 import com.mhss.app.domain.use_case.GetNoteFolderUseCase
 import com.mhss.app.domain.use_case.GetNoteUseCase
+import com.mhss.app.domain.use_case.RemoveNoteLinkUseCase
 import com.mhss.app.domain.use_case.SearchNoteFoldersByNameUseCase
 import com.mhss.app.domain.use_case.SearchNotesUseCase
 import com.mhss.app.domain.use_case.UpsertNoteUseCase
@@ -24,7 +28,10 @@ class NoteToolSet(
     private val getNote: GetNoteUseCase,
     private val createFolderUseCase: CreateNoteFolderUseCase,
     private val searchNoteFoldersByName: SearchNoteFoldersByNameUseCase,
-    private val getNoteFolder: GetNoteFolderUseCase
+    private val getNoteFolder: GetNoteFolderUseCase,
+    private val getLinkedNotesUseCase: GetLinkedNotesUseCase,
+    private val getBacklinksUseCase: GetBacklinksUseCase,
+    private val createNoteLinkUseCase: CreateNoteLinkUseCase
 ) : ToolSet {
 
     @Tool(SEARCH_NOTES_TOOL)
@@ -101,6 +108,40 @@ class NoteToolSet(
         return CreateNoteFolderResult(
             folderId = createFolderUseCase(folderName = name)
         )
+    }
+
+    @Tool(GET_LINKED_NOTES_TOOL)
+    @LLMDescription("Get notes linked to a specific note.")
+    suspend fun getLinkedNotes(
+        @LLMDescription("Note ID") noteId: String
+    ): SearchNotesResult {
+        val note = getNote(noteId) ?: throw IllegalArgumentException("No note found with ID: '$noteId'")
+        return SearchNotesResult(getLinkedNotesUseCase(noteId))
+    }
+
+    @Tool(GET_BACKLINKS_TOOL)
+    @LLMDescription("Get backlinks (notes that link to this note).")
+    suspend fun getBacklinks(
+        @LLMDescription("Note ID") noteId: String
+    ): SearchNotesResult {
+        val note = getNote(noteId) ?: throw IllegalArgumentException("No note found with ID: '$noteId'")
+        return SearchNotesResult(getBacklinksUseCase(noteId))
+    }
+
+    @Tool(CREATE_NOTE_LINK_TOOL)
+    @LLMDescription("Create a link between two notes.")
+    suspend fun createNoteLink(
+        @LLMDescription("Source note ID") fromNoteId: String,
+        @LLMDescription("Target note ID or title") toNoteIdOrTitle: String
+    ): NoteIdResult {
+        val fromNote = getNote(fromNoteId) ?: throw IllegalArgumentException("No source note found with ID: '$fromNoteId'")
+        
+        val toNote = getNote(toNoteIdOrTitle) 
+            ?: searchNotesByName(toNoteIdOrTitle).firstOrNull()
+            ?: throw IllegalArgumentException("No target note found with ID or title: '$toNoteIdOrTitle'")
+        
+        createNoteLinkUseCase(fromNote, toNote.id)
+        return NoteIdResult(createdNoteId = toNote.id)
     }
 
 }

@@ -65,7 +65,10 @@ import androidx.lifecycle.compose.LifecycleStartEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.mhss.app.presentation.components.AiResultSheet
+import com.mhss.app.presentation.components.BacklinksPanel
 import com.mhss.app.presentation.components.GradientIconButton
+import com.mhss.app.presentation.components.InsertNoteLinkDialog
+import com.mhss.app.presentation.components.MarkdownWithLinks
 import com.mhss.app.presentation.components.ShareNoteAsPlainTextOption
 import com.mhss.app.ui.R
 import com.mhss.app.ui.components.common.MyBrainAppBar
@@ -103,6 +106,10 @@ fun NoteDetailsScreen(
     val pinned = state.pinned
     val readingMode = state.readingMode
     val folder = state.folder
+    val linkedNotes = state.linkedNotes
+    val backlinks = state.backlinks
+    val showInsertLinkDialog = state.showInsertLinkDialog
+    val showBacklinksPanel = state.showBacklinksPanel
     val lastModified by remember(state.note?.updatedDate) {
         derivedStateOf {
             state.note?.updatedDate?.formatDateDependingOnDay(context) ?: ""
@@ -112,6 +119,7 @@ fun NoteDetailsScreen(
     val aiEnabled by viewModel.aiEnabled.collectAsStateWithLifecycle()
     val aiState = viewModel.aiState
     val showAiSheet = aiState.showAiSheet
+    val allNotes by viewModel.allNotes.collectAsStateWithLifecycle(initialValue = emptyList())
 
     val liquidState = rememberLiquidState()
     LaunchedEffect(content) {
@@ -213,6 +221,16 @@ fun NoteDetailsScreen(
                             tint = if (readingMode) Color.Green else Color.Gray
                         )
                     }
+                    IconButton(onClick = {
+                        viewModel.onEvent(NoteDetailsEvent.ShowInsertLinkDialog)
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_open_link),
+                            contentDescription = "Insert link",
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             )
         },
@@ -273,15 +291,15 @@ fun NoteDetailsScreen(
                 }
             }
             if (readingMode)
-                Markdown(
+                MarkdownWithLinks(
                     content = content,
+                    onLinkClick = { linkText ->
+                        viewModel.onEvent(NoteDetailsEvent.UpdateContent("\n[[$linkText]]\n"))
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
                         .padding(8.dp)
-                        .liquefiable(liquidState),
-                    imageTransformer = Coil2ImageTransformerImpl,
-                    typography = defaultMarkdownTypography()
                 )
             else
                 OutlinedTextField(
@@ -308,6 +326,16 @@ fun NoteDetailsScreen(
                 Text(
                     text = wordCountString,
                     style = MaterialTheme.typography.bodySmall.copy(color = Color.Gray)
+                )
+            }
+            
+            if (readingMode && backlinks.isNotEmpty()) {
+                BacklinksPanel(
+                    backlinks = backlinks,
+                    onNoteClick = { note ->
+                        navController.navigate("notes/${note.id}")
+                    },
+                    modifier = Modifier.padding(top = 12.dp)
                 )
             }
         }
@@ -457,6 +485,19 @@ fun NoteDetailsScreen(
                     }
                 }
             })
+        
+        if (showInsertLinkDialog) {
+            InsertNoteLinkDialog(
+                allNotes = allNotes,
+                onLinkSelected = { note ->
+                    val linkText = "[[${note.title}]]"
+                    viewModel.onEvent(NoteDetailsEvent.UpdateContent(content + linkText))
+                },
+                onDismiss = {
+                    viewModel.onEvent(NoteDetailsEvent.DismissInsertLinkDialog)
+                }
+            )
+        }
     }
 }
 

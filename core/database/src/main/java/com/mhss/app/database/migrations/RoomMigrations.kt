@@ -228,3 +228,24 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         db.execSQL("CREATE INDEX idx_habits_updated_date ON habits(updated_date)")
     }
 }
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("""
+            CREATE TABLE note_links (
+                id TEXT PRIMARY KEY NOT NULL,
+                from_note_id TEXT NOT NULL,
+                to_note_id TEXT NOT NULL,
+                created_date INTEGER NOT NULL DEFAULT 0,
+                FOREIGN KEY (from_note_id) REFERENCES notes(id) ON DELETE CASCADE,
+                FOREIGN KEY (to_note_id) REFERENCES notes(id) ON DELETE CASCADE
+            )
+        """.trimIndent())
+        
+        db.execSQL("CREATE INDEX idx_note_links_from ON note_links(from_note_id)")
+        db.execSQL("CREATE INDEX idx_note_links_to ON note_links(to_note_id)")
+        
+        db.execSQL("ALTER TABLE notes ADD COLUMN linked_note_ids TEXT NOT NULL DEFAULT '[]'")
+        db.execSQL("ALTER TABLE notes ADD COLUMN backlink_count INTEGER NOT NULL DEFAULT 0")
+    }
+}
