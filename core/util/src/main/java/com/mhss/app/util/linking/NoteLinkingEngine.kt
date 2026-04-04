@@ -33,6 +33,7 @@ class NoteLinkingEngine {
                 val linkContent = match.groupValues[1].trim()
                 parseLinkContent(linkContent)
             }
+            .toList()
             .distinctBy { it.text.lowercase() }
     }
 
