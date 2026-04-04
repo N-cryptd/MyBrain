@@ -16,10 +16,11 @@ import com.mhss.app.database.entity.DiaryEntryEntity
 import com.mhss.app.database.entity.HabitEntity
 import com.mhss.app.database.entity.NoteEntity
 import com.mhss.app.database.entity.NoteFolderEntity
+import com.mhss.app.database.entity.NoteLinkEntity
 import com.mhss.app.database.entity.TaskEntity
 
 @Database(
-    entities = [NoteEntity::class, TaskEntity::class, DiaryEntryEntity::class, BookmarkEntity::class, AlarmEntity::class, NoteFolderEntity::class, HabitEntity::class],
+    entities = [NoteEntity::class, TaskEntity::class, DiaryEntryEntity::class, BookmarkEntity::class, AlarmEntity::class, NoteFolderEntity::class, HabitEntity::class, NoteLinkEntity::class],
     version = 7
 )
 @TypeConverters(DBConverters::class)

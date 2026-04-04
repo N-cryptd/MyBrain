@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose.compiler)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -58,4 +59,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     api(libs.kotlinx.datetime)
+    implementation(libs.kotlinx.serialization.json)
 }

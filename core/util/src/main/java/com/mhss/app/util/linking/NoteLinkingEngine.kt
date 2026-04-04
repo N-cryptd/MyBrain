@@ -1,15 +1,9 @@
 package com.mhss.app.util.linking
 
-import com.mhss.app.domain.model.Note
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable
 data class NoteLink(
@@ -24,14 +18,15 @@ data class NoteLink(
     }
 }
 
+data class NoteRef(val id: String, val title: String)
+
 class NoteLinkingEngine {
-    
+
     private val linkPattern = Regex("""\[\[([^\]]+)\]\]""")
-    private val displayTextPattern = Regex("""\|\s*([^|]+)\s*$""")
     private val uuidPattern = Regex("""^[0-9a-fA-F-]{36}$""")
-    
+
     private val json = Json { ignoreUnknownKeys = true }
-    
+
     fun detectLinks(content: String): List<NoteLink> {
         return linkPattern.findAll(content)
             .map { match ->
@@ -40,11 +35,11 @@ class NoteLinkingEngine {
             }
             .distinctBy { it.text.lowercase() }
     }
-    
+
     fun resolveLink(
         linkText: String,
-        allNotes: List<Note>
-    ): Note? {
+        allNotes: List<NoteRef>
+    ): NoteRef? {
         return when {
             uuidPattern.matches(linkText) -> {
                 allNotes.find { it.id.equals(linkText, ignoreCase = true) }
@@ -58,7 +53,7 @@ class NoteLinkingEngine {
             }
         }
     }
-    
+
     fun replaceLinksInContent(
         content: String,
         replacement: (NoteLink) -> String
@@ -69,13 +64,13 @@ class NoteLinkingEngine {
             replacement(link)
         }
     }
-    
+
     fun extractLinkedNoteIds(linkedNoteIdsJson: String): List<String> {
         return try {
             val jsonElement = json.parseToJsonElement(linkedNoteIdsJson)
             if (jsonElement is JsonArray) {
-                jsonElement.mapNotNull { 
-                    (it as? JsonPrimitive)?.content 
+                jsonElement.mapNotNull {
+                    (it as? JsonPrimitive)?.content
                 }
             } else {
                 emptyList()
@@ -84,13 +79,11 @@ class NoteLinkingEngine {
             emptyList()
         }
     }
-    
+
     fun formatLinkedNoteIds(noteIds: List<String>): String {
-        return json.encodeToJsonElement(
-            JsonArray(noteIds.map { jsonPrimitive(it) })
-        ).toString()
+        return JsonArray(noteIds.map { JsonPrimitive(it) }).toString()
     }
-    
+
     private fun parseLinkContent(content: String): NoteLink {
         return if (content.contains("|")) {
             val parts = content.split("|", limit = 2)
@@ -113,18 +106,18 @@ class NoteLinkingEngine {
             )
         }
     }
-    
-    private fun findNoteByTitle(title: String, notes: List<Note>): Note? {
-        return notes.find { 
-            it.title.equals(title, ignoreCase = true) 
-        } ?: notes.find { 
-            it.title.contains(title, ignoreCase = true) 
+
+    private fun findNoteByTitle(title: String, notes: List<NoteRef>): NoteRef? {
+        return notes.find {
+            it.title.equals(title, ignoreCase = true)
+        } ?: notes.find {
+            it.title.contains(title, ignoreCase = true)
         }
     }
-    
+
     private fun List<NoteLink>.distinctBy(selector: (NoteLink) -> String): List<NoteLink> {
         val seen = mutableSetOf<String>()
-        return filter { 
+        return filter {
             val key = selector(it).lowercase()
             seen.add(key)
         }

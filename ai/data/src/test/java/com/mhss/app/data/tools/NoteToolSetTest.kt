@@ -3,6 +3,9 @@ package com.mhss.app.data.tools
 import com.mhss.app.domain.model.Note
 import com.mhss.app.domain.model.NoteFolder
 import com.mhss.app.domain.use_case.CreateNoteFolderUseCase
+import com.mhss.app.domain.use_case.CreateNoteLinkUseCase
+import com.mhss.app.domain.use_case.GetBacklinksUseCase
+import com.mhss.app.domain.use_case.GetLinkedNotesUseCase
 import com.mhss.app.domain.use_case.GetNoteFolderUseCase
 import com.mhss.app.domain.use_case.GetNoteUseCase
 import com.mhss.app.domain.use_case.SearchNoteFoldersByNameUseCase
@@ -29,6 +32,9 @@ class NoteToolSetTest {
     private val createFolderUseCase: CreateNoteFolderUseCase = mockk()
     private val searchNoteFoldersByName: SearchNoteFoldersByNameUseCase = mockk()
     private val getNoteFolder: GetNoteFolderUseCase = mockk()
+    private val getLinkedNotesUseCase: GetLinkedNotesUseCase = mockk(relaxed = true)
+    private val getBacklinksUseCase: GetBacklinksUseCase = mockk(relaxed = true)
+    private val createNoteLinkUseCase: CreateNoteLinkUseCase = mockk(relaxed = true)
 
     @Before
     fun setup() {
@@ -39,7 +45,10 @@ class NoteToolSetTest {
             getNote = getNote,
             createFolderUseCase = createFolderUseCase,
             searchNoteFoldersByName = searchNoteFoldersByName,
-            getNoteFolder = getNoteFolder
+            getNoteFolder = getNoteFolder,
+            getLinkedNotesUseCase = getLinkedNotesUseCase,
+            getBacklinksUseCase = getBacklinksUseCase,
+            createNoteLinkUseCase = createNoteLinkUseCase
         )
     }
 

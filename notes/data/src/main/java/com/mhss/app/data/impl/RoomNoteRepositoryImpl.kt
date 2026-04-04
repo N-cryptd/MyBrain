@@ -2,19 +2,17 @@ package com.mhss.app.data.impl
 
 import com.mhss.app.database.dao.NoteDao
 import com.mhss.app.database.entity.NoteFolderEntity
+import com.mhss.app.database.entity.NoteLinkEntity
 import com.mhss.app.database.entity.toNote
 import com.mhss.app.database.entity.toNoteEntity
 import com.mhss.app.database.entity.toNoteFolder
 import com.mhss.app.database.entity.toNoteFolderEntity
-import com.mhss.app.database.entity.toNote
-import com.mhss.app.database.entity.NoteListItem
-import com.mhss.app.database.entity.toNote
-import com.mhss.app.database.entity.NoteLinkEntity
 import com.mhss.app.domain.model.Note
 import com.mhss.app.domain.model.NoteFolder
 import com.mhss.app.domain.repository.NoteRepository
 import com.mhss.app.util.errors.NoteException
 import com.mhss.app.util.linking.NoteLinkingEngine
+import com.mhss.app.util.linking.NoteRef
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -176,8 +174,9 @@ class RoomNoteRepositoryImpl(
     override suspend fun updateNoteLinks(noteId: String, content: String, allNotes: List<Note>) {
         withContext(ioDispatcher) {
             val links = linkingEngine.detectLinks(content)
+            val noteRefs = allNotes.map { NoteRef(it.id, it.title) }
             val linkedNoteIds = links.mapNotNull { link ->
-                linkingEngine.resolveLink(link.text, allNotes)?.id
+                linkingEngine.resolveLink(link.text, noteRefs)?.id
             }
             val linkedNoteIdsJson = linkingEngine.formatLinkedNoteIds(linkedNoteIds)
             

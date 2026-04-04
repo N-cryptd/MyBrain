@@ -12,7 +12,6 @@ import com.mhss.app.domain.use_case.GetBacklinksUseCase
 import com.mhss.app.domain.use_case.GetLinkedNotesUseCase
 import com.mhss.app.domain.use_case.GetNoteFolderUseCase
 import com.mhss.app.domain.use_case.GetNoteUseCase
-import com.mhss.app.domain.use_case.RemoveNoteLinkUseCase
 import com.mhss.app.domain.use_case.SearchNoteFoldersByNameUseCase
 import com.mhss.app.domain.use_case.SearchNotesUseCase
 import com.mhss.app.domain.use_case.UpsertNoteUseCase
