@@ -139,7 +139,7 @@ class NoteToolSet(
             ?: searchNotesByName(toNoteIdOrTitle).firstOrNull()
             ?: throw IllegalArgumentException("No target note found with ID or title: '$toNoteIdOrTitle'")
         
-        createNoteLinkUseCase(fromNote, toNote.id)
+        createNoteLinkUseCase(fromNote.id, toNote.id)
         return NoteIdResult(createdNoteId = toNote.id)
     }
 
