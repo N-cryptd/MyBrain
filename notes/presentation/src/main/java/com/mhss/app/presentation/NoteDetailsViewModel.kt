@@ -29,6 +29,8 @@ import com.mhss.app.preferences.domain.use_case.GetPreferenceUseCase
 import com.mhss.app.ui.R
 import com.mhss.app.ui.errors.toSnackbarError
 import com.mhss.app.ui.snackbar.showSnackbar
+import com.mhss.app.preferences.domain.model.Order
+import com.mhss.app.preferences.domain.model.OrderType
 import com.mhss.app.util.date.now
 import com.mhss.app.util.errors.NoteException
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -116,7 +118,7 @@ class NoteDetailsViewModel(
                     emptyList()
                 }
                 
-                val allNotesList = getAllNotes().first()
+                val allNotesList = getAllNotes(Order.DateModified(OrderType.DESC), true).first()
 
                 _allNotes.value = allNotesList
 
