@@ -83,22 +83,3 @@ class MarkdownNoteRepositoryImpl(
     override suspend fun updateNoteLinks(noteId: String, content: String, allNotes: List<Note>) {}
 
 }
-
-    override suspend fun getLinkedNotes(noteId: String): List<Note> {
-        return emptyList()
-    }
-
-    override suspend fun getBacklinks(noteId: String): List<Note> {
-        return emptyList()
-    }
-
-    override suspend fun createLink(fromNoteId: String, toNoteId: String) {
-    }
-
-    override suspend fun removeLink(fromNoteId: String, toNoteId: String) {
-    }
-
-    override suspend fun updateNoteLinks(noteId: String, content: String, allNotes: List<Note>) {
-    }
-
-}
