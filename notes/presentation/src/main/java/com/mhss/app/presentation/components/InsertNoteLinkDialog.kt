@@ -58,7 +58,6 @@ fun InsertNoteLinkDialog(
     
     AlertDialog(
         onDismissRequest = onDismiss,
-        shape = RoundedCornerShape(25.dp),
         modifier = modifier
     ) {
         Column(
@@ -114,7 +113,6 @@ fun InsertNoteLinkDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(24.dp)
-                                .align(Alignment.CenterHorizontally)
                         )
                     }
                 }
