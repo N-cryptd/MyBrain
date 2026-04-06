@@ -447,9 +447,11 @@ fun formatTime(timeInMillis: Long): String {
 
 @Composable
 fun AddHabitBottomSheetContent(
-    onCreateHabit: () -> Unit,
+    onCreateHabit: (String) -> Unit,
     onCancel: () -> Unit
 ) {
+    var title by rememberSaveable { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -461,9 +463,9 @@ fun AddHabitBottomSheetContent(
             fontWeight = FontWeight.Bold
         )
         Spacer(modifier = Modifier.height(16.dp))
-        androidx.compose.material3.OutlinedTextField(
-            value = "",
-            onValueChange = { },
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
             label = { Text(stringResource(R.string.title)) },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -478,8 +480,8 @@ fun AddHabitBottomSheetContent(
             }
             Spacer(modifier = Modifier.width(8.dp))
             Button(
-                onClick = onCreateHabit,
-                enabled = true
+                onClick = { onCreateHabit(title) },
+                enabled = title.isNotBlank()
             ) {
                 Text(stringResource(R.string.save))
             }

@@ -294,7 +294,12 @@ fun NoteDetailsScreen(
                 MarkdownWithLinks(
                     content = content,
                     onLinkClick = { linkText ->
-                        viewModel.onEvent(NoteDetailsEvent.UpdateContent("\n[[$linkText]]\n"))
+                        val linkedNote = allNotes.find {
+                            it.title.equals(linkText, ignoreCase = true)
+                        }
+                        if (linkedNote != null) {
+                            navController.navigate("notes/${linkedNote.id}")
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()

@@ -7,6 +7,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mhss.app.domain.model.Habit
+import com.mhss.app.domain.model.HabitFrequency
+import com.mhss.app.domain.model.Priority
 import com.mhss.app.domain.use_case.CompleteHabitUseCase
 import com.mhss.app.domain.use_case.DeleteHabitUseCase
 import com.mhss.app.domain.use_case.GetAllHabitsUseCase
@@ -109,6 +111,17 @@ class HabitsViewModel(
             } else {
                 completeHabit(habit.id)
             }
+        }
+    }
+
+    fun createHabitAndNavigate(title: String) {
+        viewModelScope.launch {
+            val habit = Habit(
+                title = title,
+                createdDate = System.currentTimeMillis(),
+                updatedDate = System.currentTimeMillis()
+            )
+            upsertHabit(habit)
         }
     }
 
