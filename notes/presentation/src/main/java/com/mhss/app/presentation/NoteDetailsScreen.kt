@@ -68,6 +68,7 @@ import com.mhss.app.presentation.components.AiResultSheet
 import com.mhss.app.presentation.components.BacklinksPanel
 import com.mhss.app.presentation.components.GradientIconButton
 import com.mhss.app.presentation.components.InsertNoteLinkDialog
+import com.mhss.app.presentation.components.LinkedNotesPanel
 import com.mhss.app.presentation.components.MarkdownWithLinks
 import com.mhss.app.presentation.components.ShareNoteAsPlainTextOption
 import com.mhss.app.ui.R
@@ -76,6 +77,8 @@ import com.mhss.app.ui.components.common.defaultMarkdownTypography
 import com.mhss.app.ui.snackbar.LocalisedSnackbarHost
 import com.mhss.app.ui.theme.Orange
 import com.mhss.app.util.date.formatDateDependingOnDay
+import com.mhss.app.util.linking.NoteLinkingEngine
+import com.mhss.app.util.linking.NoteRef
 import com.mikepenz.markdown.coil2.Coil2ImageTransformerImpl
 import com.mikepenz.markdown.m3.Markdown
 import io.github.fletchmckee.liquid.liquefiable
@@ -290,15 +293,18 @@ fun NoteDetailsScreen(
                     }
                 }
             }
-            if (readingMode)
+            if (readingMode) {
+                val linkingEngine = remember { NoteLinkingEngine() }
+                val noteRefs = remember(allNotes) {
+                    allNotes.map { NoteRef(it.id, it.title) }
+                }
+
                 MarkdownWithLinks(
                     content = content,
                     onLinkClick = { linkText ->
-                        val linkedNote = allNotes.find {
-                            it.title.equals(linkText, ignoreCase = true)
-                        }
-                        if (linkedNote != null) {
-                            navController.navigate("notes/${linkedNote.id}")
+                        val linkedNoteRef = linkingEngine.resolveLink(linkText, noteRefs)
+                        linkedNoteRef?.let { noteRef ->
+                            navController.navigate("notes/${noteRef.id}")
                         }
                     },
                     modifier = Modifier
@@ -306,6 +312,7 @@ fun NoteDetailsScreen(
                         .padding(vertical = 6.dp)
                         .padding(8.dp)
                 )
+            }
             else
                 OutlinedTextField(
                     value = content,
@@ -339,6 +346,22 @@ fun NoteDetailsScreen(
                     backlinks = backlinks,
                     onNoteClick = { note ->
                         navController.navigate("notes/${note.id}")
+                    },
+                    modifier = Modifier.padding(top = 12.dp)
+                )
+            }
+            
+            if (readingMode && linkedNotes.isNotEmpty()) {
+                LinkedNotesPanel(
+                    linkedNotes = linkedNotes,
+                    onNoteClick = { note ->
+                        navController.navigate("notes/${note.id}")
+                    },
+                    onRemoveLink = { note ->
+                        viewModel.onEvent(NoteDetailsEvent.RemoveLink(
+                            fromNoteId = state.note!!.id,
+                            toNoteId = note.id
+                        ))
                     },
                     modifier = Modifier.padding(top = 12.dp)
                 )

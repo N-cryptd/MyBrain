@@ -18,6 +18,7 @@ sealed class NoteDetailsEvent {
     data object ToggleBacklinksPanel : NoteDetailsEvent()
     data object ShowInsertLinkDialog : NoteDetailsEvent()
     data object DismissInsertLinkDialog : NoteDetailsEvent()
+    data class RemoveLink(val fromNoteId: String, val toNoteId: String) : NoteDetailsEvent()
 }
 
 sealed interface AiAction

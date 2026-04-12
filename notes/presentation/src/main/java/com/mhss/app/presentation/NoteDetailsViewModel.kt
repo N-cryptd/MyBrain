@@ -19,8 +19,10 @@ import com.mhss.app.domain.use_case.GetBacklinksUseCase
 import com.mhss.app.domain.use_case.GetLinkedNotesUseCase
 import com.mhss.app.domain.use_case.GetNoteFolderUseCase
 import com.mhss.app.domain.use_case.GetNoteUseCase
+import com.mhss.app.domain.use_case.RemoveNoteLinkUseCase
 import com.mhss.app.domain.use_case.SendAiPromptUseCase
 import com.mhss.app.domain.use_case.UpsertNoteUseCase
+import com.mhss.app.domain.use_case.UpdateNoteLinksUseCase
 import com.mhss.app.preferences.PrefsConstants
 import com.mhss.app.preferences.domain.model.AiProvider
 import com.mhss.app.preferences.domain.model.intPreferencesKey
@@ -59,6 +61,8 @@ class NoteDetailsViewModel(
     private val getAllNotes: GetAllNotesUseCase,
     private val getLinkedNotesUseCase: GetLinkedNotesUseCase,
     private val getBacklinksUseCase: GetBacklinksUseCase,
+    private val removeLink: RemoveNoteLinkUseCase,
+    private val updateNoteLinks: UpdateNoteLinksUseCase,
     private val sendAiPrompt: SendAiPromptUseCase,
     @Named("applicationScope") private val applicationScope: CoroutineScope,
     id: String,
@@ -193,6 +197,17 @@ class NoteDetailsViewModel(
                 _noteUiState.update { it.copy(showInsertLinkDialog = false) }
             }
 
+            is NoteDetailsEvent.RemoveLink -> {
+                viewModelScope.launch {
+                    removeLink(event.fromNoteId, event.toNoteId)
+                    val currentNoteId = noteUiState.value.note?.id
+                    currentNoteId?.let { noteId ->
+                        val linkedNotes = getLinkedNotesUseCase(noteId)
+                        _noteUiState.update { it.copy(linkedNotes = linkedNotes) }
+                    }
+                }
+            }
+
             is AiAction -> aiActionJob = viewModelScope.launch {
                 val prompt = when (event) {
                     is NoteDetailsEvent.Summarize -> event.content.summarizeNotePrompt
@@ -245,6 +260,7 @@ class NoteDetailsViewModel(
 
         val folderId = noteUiState.value.folder?.id
         val pinned = noteUiState.value.pinned
+        var savedNoteId: String? = null
 
         if (noteUiState.value.note == null) {
             if (title.isNotBlank() || content.isNotBlank()) {
@@ -257,6 +273,7 @@ class NoteDetailsViewModel(
                     updatedDate = now()
                 )
                 val noteId = upsertNote(note, null)
+                savedNoteId = noteId
                 _noteUiState.update {
                     it.copy(
                         note = note.copy(
@@ -282,12 +299,17 @@ class NoteDetailsViewModel(
                     updatedDate = now()
                 )
                 val noteId = upsertNote(newNote, currentNote.folderId)
+                savedNoteId = noteId
                 _noteUiState.update {
                     it.copy(
                         note = newNote.copy(id = noteId)
                     )
                 }
             }
+        }
+
+        savedNoteId?.let { noteId ->
+            updateNoteLinks(noteId, content)
         }
     }
 

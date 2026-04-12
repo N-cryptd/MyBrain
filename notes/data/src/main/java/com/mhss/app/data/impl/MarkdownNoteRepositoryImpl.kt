@@ -6,11 +6,16 @@ import com.mhss.app.data.storage.MarkdownFileManager
 import com.mhss.app.domain.model.Note
 import com.mhss.app.domain.model.NoteFolder
 import com.mhss.app.domain.repository.NoteRepository
+import com.mhss.app.util.linking.NoteLinkingEngine
+import com.mhss.app.util.linking.NoteRef
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class MarkdownNoteRepositoryImpl(
     private val markdownFileManager: MarkdownFileManager,
     private val rootUri: Uri,
+    private val linkingEngine: NoteLinkingEngine = NoteLinkingEngine()
 ) : NoteRepository {
 
     override fun getAllFolderlessNotes(): Flow<List<Note>> {
@@ -21,8 +26,12 @@ class MarkdownNoteRepositoryImpl(
         return markdownFileManager.getAllNotesFlow(rootUri)
     }
 
-    override suspend fun getNote(id: String): Note {
-        return markdownFileManager.getNote(id.toUri())
+    override suspend fun getNote(id: String): Note? {
+        return try {
+            markdownFileManager.getNote(id.toUri())
+        } catch (e: Exception) {
+            null
+        }
     }
 
     override suspend fun searchNotes(query: String): List<Note> {
@@ -72,14 +81,108 @@ class MarkdownNoteRepositoryImpl(
         return markdownFileManager.searchFolderByName(name, rootUri)
     }
 
-    override suspend fun getLinkedNotes(noteId: String): List<Note> = emptyList()
+    override suspend fun getLinkedNotes(noteId: String): List<Note> {
+        return try {
+            val note = getNote(noteId) ?: return emptyList()
+            val linkTitles = parseLinkTitles(note.content)
+            val allNotes = getAllNotesFlow(rootUri).first()
+            val noteRefs = allNotes.map { NoteRef(it.id, it.title) }
 
-    override suspend fun getBacklinks(noteId: String): List<Note> = emptyList()
+            linkTitles.mapNotNull { link ->
+                linkingEngine.resolveLink(link, noteRefs)?.id
+            }.mapNotNull { linkedNoteId ->
+                allNotes.find { it.id == linkedNoteId }
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 
-    override suspend fun createLink(fromNoteId: String, toNoteId: String) {}
+    override suspend fun getBacklinks(noteId: String): List<Note> {
+        return try {
+            val allNotes = getAllNotesFlow(rootUri).first()
 
-    override suspend fun removeLink(fromNoteId: String, toNoteId: String) {}
+            allNotes.filter { otherNote ->
+                if (otherNote.id == noteId) return@filter false
 
-    override suspend fun updateNoteLinks(noteId: String, content: String, allNotes: List<Note>) {}
+                val linkTitles = parseLinkTitles(otherNote.content)
+                val noteRefs = allNotes.map { NoteRef(it.id, it.title) }
 
+                linkTitles.any { link ->
+                    val resolvedNote = linkingEngine.resolveLink(link, noteRefs)
+                    resolvedNote?.id == noteId
+                }
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    override suspend fun createLink(fromNoteId: String, toNoteId: String) {
+        try {
+            val fromNote = getNote(fromNoteId) ?: return
+            val toNote = getNote(toNoteId) ?: return
+
+            if (!parseLinkTitles(fromNote.content).any {
+                it.equals(toNote.title, ignoreCase = true)
+            }) {
+                val linkText = "[[${toNote.title}]]"
+                val updatedContent = fromNote.content.trim() + "\n\n" + linkText
+                upsertNote(fromNote.copy(content = updatedContent), null)
+            }
+        } catch (e: Exception) {
+        }
+    }
+
+    override suspend fun removeLink(fromNoteId: String, toNoteId: String) {
+        try {
+            val fromNote = getNote(fromNoteId) ?: return
+            val toNote = getNote(toNoteId) ?: return
+
+            val linkText = "[[${toNote.title}]]"
+            val updatedContent = fromNote.content.replace(linkText, "")
+            upsertNote(fromNote.copy(content = updatedContent.trim()), null)
+        } catch (e: Exception) {
+        }
+    }
+
+    override suspend fun updateNoteLinks(noteId: String, content: String, allNotes: List<Note>) {
+        try {
+            val linkTitles = parseLinkTitles(content)
+            val noteRefs = allNotes.map { NoteRef(it.id, it.title) }
+
+            val linkedNoteIds = linkTitles.mapNotNull { link ->
+                linkingEngine.resolveLink(link, noteRefs)?.id
+            }
+
+            val note = getNote(noteId)
+            if (note != null && linkedNoteIds.isNotEmpty()) {
+                val updatedNote = note.copy(linkedNoteIds = formatLinkedNoteIdsJson(linkedNoteIds))
+                upsertNote(updatedNote, null)
+            }
+        } catch (e: Exception) {
+        }
+    }
+
+    private fun parseLinkTitles(content: String): List<String> {
+        val linkPattern = Regex("""\[\[([^\]]+)\]\]""")
+        return linkPattern.findAll(content)
+            .map { match ->
+                val linkContent = match.groupValues[1].trim()
+                if (linkContent.contains("|")) {
+                    linkContent.substringBefore("|").trim()
+                } else {
+                    linkContent
+                }
+            }
+            .distinctBy { it.lowercase() }
+    }
+
+    private fun formatLinkedNoteIdsJson(noteIds: List<String>): String {
+        return noteIds.joinToString(prefix = "[", separator = ",", postfix = "]") { "\"$it\"" }
+    }
+
+    private fun getAllNotesFlow(rootUri: Uri): Flow<List<Note>> {
+        return markdownFileManager.getAllNotesFlow(rootUri)
+    }
 }
