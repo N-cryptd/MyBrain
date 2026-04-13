@@ -176,6 +176,7 @@ class MarkdownNoteRepositoryImpl(
                 }
             }
             .distinctBy { it.lowercase() }
+            .toList()
     }
 
     private fun formatLinkedNoteIdsJson(noteIds: List<String>): String {
